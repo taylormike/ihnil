@@ -1,0 +1,9 @@
+# File types to ignore
+
+*.pyc
+*.py~
+*~
+
+# Ignore the specific folder
+
+__pycache__/
