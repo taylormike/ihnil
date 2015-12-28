@@ -11,8 +11,11 @@ any other potential uses!
 After installation, simply run via the below in the command line:  
 
 ```
-python3 reader.py <module>
+python3 reader.py [ -s | -l ] <module>
 ```
+For help run optional argument `-h`    
+
+Only available for Python 3.  
 
 ## Contribution
 
