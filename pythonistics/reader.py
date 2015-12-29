@@ -1,13 +1,12 @@
 import argparse
 
 
-parser = argparse.ArgumentParser(prog="Pythonistics",
-                                 description="File processer",
+parser = argparse.ArgumentParser(description="File processer",
                                  epilog="This is the end")
 
 parser.add_argument("file_name",
-                    type=str,
-                    help="Temporary FILE help string")
+                    type=argparse.FileType(),
+                    help="Temporary %(prog)s help string")
 
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-s", "--short",
@@ -22,16 +21,15 @@ args = parser.parse_args()
 print()
 
 if args.short:
-    print(str(args.file_name) + " is the SHORT version")
+    print(str(args.file_name.name) + " is the SHORT version")
 elif args.long:
-    print(str(args.file_name) + " is the LONG version")
+    print(str(args.file_name.name) + " is the LONG version")
 else:
-    print(str(args.file_name) + " is the PLAIN version")
+    print(str(args.file_name.name) + " is the PLAIN version")
 
-with open(args.file_name, 'r') as fn:
-    print()
-    print(fn.name)
-    print()
-    print(fn.read())
+file_contents = args.file_name.read()
+
+print(file_contents)
+print("\nOccurrences of 'JOHN': " + str(file_contents.count('JOHN')))
 
 # https://docs.python.org/3/library/io.html
