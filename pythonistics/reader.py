@@ -1,4 +1,6 @@
 import argparse
+import os
+import bi_funcs
 
 
 parser = argparse.ArgumentParser(description="File processer",
@@ -17,41 +19,34 @@ group.add_argument("-l", "--long",
                    help="Temporary LONG help string")
 
 args = parser.parse_args()
-name = str(args.file_name.name)
+string_name = str(args.file_name.name)
+file_extension = os.path.splitext(string_name)[1]
 
 print()
 
-if args.short:
-    print(name + " is the SHORT version")
-elif args.long:
-    print(name + " is the LONG version")
+if file_extension == ".py":
+    if args.short:
+        print(string_name + " is the SHORT version")
+    elif args.long:
+        print(string_name + " is the LONG version")
+    else:
+        print(string_name + " is the PLAIN version")
+
+    file_contents = args.file_name.read()
+
+    print()
+
+    print("Occurrences of 'def': "
+          + str(file_contents.count('def')))
+    print("Occurrences of 'class': "
+          + str(file_contents.count('class')))
+    print("Occurrences of built in functions:")
+
+    for func in bi_funcs.bi_funcs:
+        if file_contents.count(func) > 0:
+            print(" - " + func + " is in the script "
+                  + str(file_contents.count(func)) + " times")
 else:
-    print(name + " is the PLAIN version")
-
-file_contents = args.file_name.read()
-
-bi_funcs = ['abs', 'all', 'any', 'ascii', 'bin', 'bool', 'bytearray',
-            'bytes', 'callable', 'chr', 'classmethod', 'compile',
-            'complex', 'delattr', 'dict', 'dir', 'divmod',
-            'enumerate', 'eval', 'exec', 'filter', 'float', 'format',
-            'frozenset', 'getattr', 'globals', 'hasattr', 'hash',
-            'help', 'hex', 'id', 'input', 'int', 'isinstance',
-            'issubclass', 'iter', 'len', 'len', 'list', 'locals',
-            'map', 'max', 'memoryview', 'min', 'next', 'object',
-            'oct', 'open', 'ord', 'pow', 'print', 'property',
-            'range', 'repr', 'reversed', 'round', 'set', 'setattr',
-            'slice', 'sorted', 'staticmethod', 'str', 'sum', 'super',
-            'tuple', 'type', 'vars', 'zip', '__import__']
-
-print()
-
-print("Occurrences of 'def': " + str(file_contents.count('def')))
-print("Occurrences of 'class': " + str(file_contents.count('class')))
-print("Occurrences of built in functions:")
-
-for func in bi_funcs:
-    if file_contents.count(func) > 0:
-        print(" - " + func + " is in the script "
-              + str(file_contents.count(func)) + " times")
+    print("Please enter a Python file")
 
 print()

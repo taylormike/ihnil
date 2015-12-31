@@ -11,4 +11,5 @@ __pycache__/
 # Temporarily ignore NOTES/TEST files
 
 NOTES.txt
+TEST.txt
 TEST.py
