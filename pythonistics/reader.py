@@ -1,6 +1,6 @@
 import argparse
 import os
-import bi_funcs
+import builtins
 
 
 parser = argparse.ArgumentParser(description="File processer",
@@ -42,10 +42,11 @@ if file_extension == ".py":
           + str(file_contents.count('class')))
     print("Occurrences of built in functions:")
 
-    for func in bi_funcs.bi_funcs:
+    for func in dir(builtins):
         if file_contents.count(func) > 0:
             print(" - " + func + " is in the script "
                   + str(file_contents.count(func)) + " times")
+
 else:
     print("Please enter a Python file")
 

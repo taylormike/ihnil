@@ -8,8 +8,7 @@
 
 __pycache__/
 
-# Temporarily ignore NOTES/TEST files
+# Ignore temporary files
 
-NOTES.txt
-TEST.txt
 TEST.py
+TEST.txt
