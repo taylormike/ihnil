@@ -7,8 +7,3 @@
 # Ignore the specific folder
 
 __pycache__/
-
-# Ignore temporary files
-
-TEST.py
-TEST.txt

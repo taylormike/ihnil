@@ -26,15 +26,13 @@ print()
 
 if file_extension == ".py":
     if args.short:
-        print(string_name + " is the SHORT version")
+        print(string_name + " is the SHORT version\n")
     elif args.long:
-        print(string_name + " is the LONG version")
+        print(string_name + " is the LONG version\n")
     else:
-        print(string_name + " is the PLAIN version")
+        print(string_name + " is the PLAIN version\n")
 
     file_contents = args.file_name.read()
-
-    print()
 
     print("Occurrences of 'def': "
           + str(file_contents.count('def')))
@@ -46,7 +44,6 @@ if file_extension == ".py":
         if file_contents.count(func) > 0:
             print(" - " + func + " is in the script "
                   + str(file_contents.count(func)) + " times")
-
 else:
     print("Please enter a Python file")
 
