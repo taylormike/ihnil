@@ -1,6 +1,7 @@
 import argparse
 import os
 import builtins
+import tokenize
 
 
 parser = argparse.ArgumentParser(description="File processer",
@@ -26,24 +27,40 @@ print()
 
 if file_extension == ".py":
     if args.short:
-        print(string_name + " is the SHORT version\n")
+        print("{} is the SHORT version\n".format(string_name))
     elif args.long:
-        print(string_name + " is the LONG version\n")
+        print("{} is the LONG version\n".format(string_name))
     else:
-        print(string_name + " is the PLAIN version\n")
+        print("{} is the PLAIN version\n".format(string_name))
 
     file_contents = args.file_name.read()
+    def_func = str(file_contents.count("def"))
+    class_func = str(file_contents.count("class"))
 
-    print("Occurrences of 'def': "
-          + str(file_contents.count('def')))
-    print("Occurrences of 'class': "
-          + str(file_contents.count('class')))
+    print("Occurrences of 'def': {}".format(def_func))
+    print("Occurrences of 'class': {}".format(class_func))
     print("Occurrences of built in functions:")
 
     for func in dir(builtins):
         if file_contents.count(func) > 0:
-            print(" - " + func + " is in the script "
-                  + str(file_contents.count(func)) + " times")
+            count_num = str(file_contents.count(func))
+            print(" - {} is in the script {} "
+                  "times".format(func, count_num))
+
+    print()
+
+    with tokenize._builtin_open(args.file_name.name, "rb") as t_file:
+        tokens = list(tokenize.tokenize(t_file.readline))
+
+    for token in tokens:
+        token_type = token.exact_type
+        token_range = "{}-{}".format(token.start, token.end)
+        print("{: <20}{: <15}{: <15}".format(token_range,
+                                      tokenize.tok_name[token_type],
+                                      token.string))
+
+    print()
+
 else:
     print("Please enter a Python file")
 
