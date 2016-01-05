@@ -10,6 +10,9 @@ parser = argparse.ArgumentParser(description="File processer",
 parser.add_argument("file_name",
                     type=argparse.FileType(),
                     help="Temporary %(prog)s POSITIONAL help string")
+parser.add_argument("-e", "--exact",
+                    action="store_true",
+                    help="Temporary EXACT help string")
 
 group = parser.add_mutually_exclusive_group()
 group.add_argument("-s", "--short",
@@ -53,7 +56,9 @@ if file_extension == ".py":
         tokens = list(tokenize.tokenize(t_file.readline))
 
     for token in tokens:
-        token_type = token.exact_type
+        token_type = token.type
+        if args.exact:
+            token_type = token.exact_type
         token_range = "{}-{}".format(token.start, token.end)
         print("{: <20}{: <15}{: <15}".format(token_range,
                                       tokenize.tok_name[token_type],
