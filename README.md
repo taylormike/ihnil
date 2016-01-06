@@ -11,7 +11,7 @@ any other potential uses!
 After installation, simply run via the below in the command line:  
 
 ```
-python3 reader.py [ -s | -l ] <module>
+python3 reader.py \[ -s / -l \] \[ -e \] \[ -h \] filename
 ```
 
 Note that this command line tool adhere's to many of the "traditional" Pythonic styles commonly recommended. Many of them are curated at Andrew Montalenti's [Elements of Python Style](https://github.com/amontalenti/elements-of-python-style) on GitHub.  
@@ -22,7 +22,7 @@ Currently only available for Python 3.
 
 Please adhere to `pep8` standards when contributing to this project.  
 + The official reference **style guide** can be found [here](https://www.python.org/dev/peps/pep-0008/)  
-+ The **command line linter** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
++ The **command line tool** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
 
 Pull requests will only be accepted through [Github](https://github.com/)  
 
