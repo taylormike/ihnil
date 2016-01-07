@@ -11,7 +11,7 @@ any other potential uses!
 After installation, simply run via the below in the command line:  
 
 ```
-python3 reader.py \[ --stats | --short | --nicer \] \[ --toprint | --tofile \] \[ -h \] filename  
+python3 reader.py [ --stats | --short | --nicer ] [ -h ] filename  
 ```
 
 Note that this command line tool adhere's to many of the "traditional" Pythonic styles commonly recommended. Many of them are curated at Andrew Montalenti's [Elements of Python Style](https://github.com/amontalenti/elements-of-python-style) on GitHub.  
