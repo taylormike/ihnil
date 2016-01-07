@@ -29,31 +29,50 @@ file_extension = os.path.splitext(string_name)[1]
 print()
 
 if file_extension == ".py":
-    if args.stats:
-        print("{} is the STATS version\n".format(string_name))
-    elif args.short:
-        print("{} is the SHORT version\n".format(string_name))
-    elif args.nicer:
-        print("{} is the NICER version\n".format(string_name))
-    else:
-        print("{} is the OTHER version\n".format(string_name))
-
-    print()
-
     with tokenize._builtin_open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
 
-    for token in tokens:
-        token_type = token.exact_type
-        token_name = tokenize.tok_name[token_type]
-        token_range = "{}-{}".format(token.start, token.end)
-        print("{: <20}{: <15}{: <15}".format(token_range,
-                                             str(token_name),
-                                             str(token.string)))
+    def tokener():
+        for token in tokens:
+            token_name = tokenize.tok_name[token.exact_type]
+            token_range = "{}-{}".format(token.start, token.end)
+            print("{: <20}{: <15}{: <15}".format(token_range,
+                                                 token_name,
+                                                 token.string))
 
-    print()
+    if args.stats:
+        print("{} is the STATS version\n".format(string_name))
+
+        tokener()
+
+        print()
+
+        print("Strings: {}".format(sum([1 for token in tokens if
+              tokenize.tok_name[token.exact_type] == "STRING"])))
+
+        print("'def': {}".format(sum([1 for token in tokens if
+              token.string == "def"])))
+
+        print("'class': {}".format(sum([1 for token in tokens if
+              token.string == "class"])))
+
+        print()
+
+    elif args.short:
+        print("{} is the SHORT version\n".format(string_name))
+        # Insert specific code tags (start/end, enumerated)
+        # Print out specific lines of code
+        # Yes / No / Edit / Quit
+        # Yes --> Make changes, move to next line
+        # No --> No changes, move to next line
+        # Edit --> Open file in editor
+        # Quit --> Exit
+    elif args.nicer:
+        print("{} is the NICER version\n".format(string_name))
+        # See above - similar structure
+    else:
+        print("{} is the OTHER version\n".format(string_name))
+        # Basic catch-all
 
 else:
     print("Please enter a Python file")
-
-print()
