@@ -43,17 +43,11 @@ if file_extension == ".py":
 
     elif args.write:
         print("{} is the WRITE version".format(string_name))
-        # Look for areas where lines can be removed from the code
-        # Insert specific code tags (start/end, enumerated)
-        # Print out specific lines of code
-        # Yes / No / Edit / Quit
-        # Yes --> Make changes, move to next line
-        # No --> No changes, move to next line
-        # Edit --> Open file in editor
-        # Quit --> Exit
+
     else:
         print("{} is the OTHER version".format(string_name))
-        # Basic catch-all
+
+    print()
 
 else:
     print("Please enter a Python file")
