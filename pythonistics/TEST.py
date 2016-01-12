@@ -1,6 +1,7 @@
 """This is the test Python document"""
 
 def multipy(x, y):
+    """This is the multipy docstring"""
     print(x * y)
 
 def evenpy(num):
@@ -14,6 +15,7 @@ def evenpy(num):
         print("Input is odd")
 
 class Basic():
+    """This is the Basic docstring"""
     def __init__(self):
 
     def printr(self, val):

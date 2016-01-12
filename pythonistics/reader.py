@@ -2,6 +2,7 @@ import argparse
 import os
 import builtins
 import tokenize
+import keyword
 
 
 parser = argparse.ArgumentParser(description="File processer",
@@ -12,15 +13,12 @@ parser.add_argument("file_name",
                     help="Temporary %(prog)s POSITIONAL help string")
 
 output = parser.add_mutually_exclusive_group()
-output.add_argument("--stats",
+output.add_argument("-r", "--read",
                     action="store_true",
-                    help="Temporary STATS help string")
-output.add_argument("--short",
+                    help="Temporary READ help string")
+output.add_argument("-w", "--write",
                     action="store_true",
-                    help="Temporary SHORT help string")
-output.add_argument("--nicer",
-                    action="store_true",
-                    help="Temporary NICER help string")
+                    help="Temporary WRITE help string")
 
 args = parser.parse_args()
 string_name = str(args.file_name.name)
@@ -40,26 +38,12 @@ if file_extension == ".py":
                                                  token_name,
                                                  token.string))
 
-    if args.stats:
-        print("{} is the STATS version\n".format(string_name))
+    if args.read:
+        print("{} is the READ version".format(string_name))
 
-        tokener()
-
-        print()
-
-        print("Strings: {}".format(sum([1 for token in tokens if
-              tokenize.tok_name[token.exact_type] == "STRING"])))
-
-        print("'def': {}".format(sum([1 for token in tokens if
-              token.string == "def"])))
-
-        print("'class': {}".format(sum([1 for token in tokens if
-              token.string == "class"])))
-
-        print()
-
-    elif args.short:
-        print("{} is the SHORT version\n".format(string_name))
+    elif args.write:
+        print("{} is the WRITE version".format(string_name))
+        # Look for areas where lines can be removed from the code
         # Insert specific code tags (start/end, enumerated)
         # Print out specific lines of code
         # Yes / No / Edit / Quit
@@ -67,11 +51,8 @@ if file_extension == ".py":
         # No --> No changes, move to next line
         # Edit --> Open file in editor
         # Quit --> Exit
-    elif args.nicer:
-        print("{} is the NICER version\n".format(string_name))
-        # See above - similar structure
     else:
-        print("{} is the OTHER version\n".format(string_name))
+        print("{} is the OTHER version".format(string_name))
         # Basic catch-all
 
 else:
