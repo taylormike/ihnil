@@ -14,6 +14,11 @@ def evenpy(num):
     else:
         print("Input is odd")
 
+def manyif(val):
+    if val == "EGGS":
+        if True:
+            print("Eggs & spam")
+
 class Basic():
     """This is the Basic docstring"""
     def __init__(self):

@@ -2,10 +2,9 @@ import argparse
 import os
 import builtins
 import tokenize
-import keyword
 
 
-parser = argparse.ArgumentParser(description="File processer",
+parser = argparse.ArgumentParser(description="Python code shortener",
                                  epilog="This is the end")
 
 parser.add_argument("file_name",
@@ -37,6 +36,29 @@ if file_extension == ".py":
             print("{: <20}{: <15}{: <15}".format(token_range,
                                                  token_name,
                                                  token.string))
+
+    for token in tokens:
+        if token.string == "if":
+            position = token.start
+            if position[0] - next_position == 1:
+                print("Nested 'if' statements")
+            next_position = position[0]
+    # Multiple nested if loops -> list comprehension
+    #   Generate different results based on
+    #   what conditionals are used (e.g. "!=" or "==")
+
+    for token in tokens:
+        if token.string == "if":
+            position = token.start
+            if position[1] - next_position == 0:
+                print("Stacked 'if' statements")
+            next_position = position[1]
+    # Stacked if conditional loops -> dict lookup
+    #   Generate possible dict structures
+
+    # Identical code -> functions
+    # Identical string -> string variables
+    # Triple quotes on three lines -> single line docstring
 
     if args.read:
         print("{} is the READ version".format(string_name))
