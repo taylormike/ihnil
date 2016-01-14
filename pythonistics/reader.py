@@ -1,6 +1,5 @@
 import argparse
 import os
-import builtins
 import tokenize
 
 
@@ -37,15 +36,24 @@ if file_extension == ".py":
                                                  token_name,
                                                  token.string))
 
+    next_position = 0
+    temporary = ()
     for token in tokens:
         if token.string == "if":
-            position = token.start
-            if position[0] - next_position == 1:
+            print_length = len(token.line)
+            if token.start[0] - next_position == 1:
+                print(" * " * print_length)
                 print("Nested 'if' statements")
-            next_position = position[0]
+                print(temporary[0], temporary[1].rstrip())
+                print(token.start, token.line.rstrip())
+                print(" * " * print_length)
+            next_position = token.start[0]
+            temporary = (token.start, token.line)
     # Multiple nested if loops -> list comprehension
     #   Generate different results based on
     #   what conditionals are used (e.g. "!=" or "==")
+
+    # TODO (1/14/16) - add in the token collection list
 
     for token in tokens:
         if token.string == "if":
@@ -59,6 +67,11 @@ if file_extension == ".py":
     # Identical code -> functions
     # Identical string -> string variables
     # Triple quotes on three lines -> single line docstring
+
+    # Printing out comment lines to the script will require
+    #   the file to be opened with 'read' and 'write' permissions
+    # Also include code necessary for identifying the
+    #   printed comments
 
     if args.read:
         print("{} is the READ version".format(string_name))
