@@ -39,8 +39,9 @@ if file_extension == ".py":
     for token in tokens:
         if token.string == "if":
             row = token.start[0]
-        if token.start[0]:
-            token_list.append(token.string)
+        if token.start[0] == row
+            token_list.append([token.string,
+                              tokenize.tok_name[token.exact_type]])
 
     b_count = 0
     for if_value in if_list:
