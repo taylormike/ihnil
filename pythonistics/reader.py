@@ -35,6 +35,13 @@ if file_extension == ".py":
             if_row = token.start[0]
             if_list.append([if_row, if_line])
 
+    token_list = []
+    for token in tokens:
+        if token.string == "if":
+            row = token.start[0]
+        if token.start[0]:
+            token_list.append(token.string)
+
     b_count = 0
     for if_value in if_list:
         a_count = if_value[0]
@@ -59,6 +66,9 @@ if file_extension == ".py":
     #   the file to be opened with 'read' and 'write' permissions
     # Also include code necessary for identifying the
     #   printed comments
+    # --------------------------------------------------------------
+    # Apply pep8 to each document that is run through pythonistics
+    #   This will keep all code looking "pythonic" for analysis
     # --------------------------------------------------------------
 
     if args.read:
