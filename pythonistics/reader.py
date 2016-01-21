@@ -28,30 +28,9 @@ if file_extension == ".py":
     with tokenize._builtin_open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
 
-    if_list = []
-    for token in tokens:
-        if token.string == "if":
-            if_line = token.line.rstrip()
-            if_row = token.start[0]
-            if_list.append([if_row, if_line])
-
-    token_list = []
-    for token in tokens:
-        if token.string == "if":
-            row = token.start[0]
-        if token.start[0] == row
-            token_list.append([token.string,
-                              tokenize.tok_name[token.exact_type]])
-
-    b_count = 0
-    for if_value in if_list:
-        a_count = if_value[0]
-        a_value = str(if_value)
-        if a_count - b_count == 1:
-            print(b_value)
-            print(a_value)
-        b_count = a_count
-        b_value = a_value
+    line_list = [(token.start, token.line.rstrip())
+                if token.string == "\n"
+                for token in tokens]
 
 
 
