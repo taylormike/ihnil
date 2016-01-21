@@ -29,8 +29,8 @@ if file_extension == ".py":
         tokens = list(tokenize.tokenize(t_file.readline))
 
     line_list = [(token.start, token.line.rstrip())
-                 if token.string == "\n"
-                 for token in tokens]
+                 for token in tokens
+                 if token.string == "\n"]
 
     row = 0
     row_list, token_list = [], []
