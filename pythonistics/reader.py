@@ -29,10 +29,21 @@ if file_extension == ".py":
         tokens = list(tokenize.tokenize(t_file.readline))
 
     line_list = [(token.start, token.line.rstrip())
-                if token.string == "\n"
-                for token in tokens]
+                 if token.string == "\n"
+                 for token in tokens]
 
-
+    row = 0
+    row_list, token_list = [], []
+    for token in tokens:
+        if token.start[0] == row:
+            row_list.append((token.string,
+                            tokenize.tok_name[token.exact_type]))
+        else:
+            token_list.append(row_list)
+            row_list = []
+            row_list.append((token.string,
+                             tokenize.tok_name[token.exact_type]))
+            row += 1
 
     # --------------------------------------------------------------
     # Stacked if conditional loops -> dict lookup
