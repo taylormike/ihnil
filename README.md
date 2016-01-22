@@ -11,7 +11,7 @@ any other potential uses!
 After installation, simply run via the below in the command line:  
 
 ```
-python3 reader.py [ --read | --write ] [ -h ] filename  
+python3 reader.py [ -r/--read | -w/--read ] [ -h/--help ] filename  
 ```  
 
 Currently only available for Python 3.  

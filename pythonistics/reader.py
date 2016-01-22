@@ -35,14 +35,13 @@ if file_extension == ".py":
     row = 0
     row_list, token_list = [], []
     for token in tokens:
+        values = (token.string, tokenize.tok_name[token.exact_type])
         if token.start[0] == row:
-            row_list.append((token.string,
-                            tokenize.tok_name[token.exact_type]))
+            row_list.append(values)
         else:
-            token_list.append(row_list)
+            token_list.append([row, row_list])
             row_list = []
-            row_list.append((token.string,
-                             tokenize.tok_name[token.exact_type]))
+            row_list.append(values)
             row += 1
 
     # --------------------------------------------------------------
