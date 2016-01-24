@@ -31,10 +31,14 @@ if file_extension == ".py":
     rows = list(set([token.start[0] for token in tokens]))
     row_list = [token.line.rstrip() for token in tokens
                 if token.string == "\n"]
+    row_list.insert(0, "\n")
+    row_list.append("\n")
     token_list = [[(token.string, tokenize.tok_name[token.exact_type])
                   for token in tokens
                   if token.start[0] == row_var]
                   for row_var in rows]
+
+    combo_list = [[i, j, k] for i, j, k in zip(rows, row_list, token_list)]
 
     if_list = [i[0] for i in token_list if "if" in [j[0] for j in i[2]]]
 
