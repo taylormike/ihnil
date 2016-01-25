@@ -1,10 +1,11 @@
-# Pythonistics
+# IHNIL - I Hate Nested If Loops
 
 ## Description
 
-This is a command line tool to review statistics on a given Python
-script - purely for fun but open for community expansion to
-any other potential uses!  
+Prounced: "eye-nil"
+I hate nested "if" loops. They're ugly, they're slow, they've got to go.  
+While there are *some* instances where they are necessary, let's see if we  
+can get ride of all of the useless ones.  
 
 ## Usage
 
