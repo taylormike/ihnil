@@ -1,6 +1,7 @@
 import argparse
 import os
 import tokenize
+import itertools
 
 
 parser = argparse.ArgumentParser(description="Python code shortener",
@@ -40,13 +41,15 @@ if file_extension == ".py":
 
     combo_list = [[i, j, k] for i, j, k in zip(rows, row_list, token_list)]
 
-    if_list = [i[0] for i in token_list if "if" in [j[0] for j in i[2]]]
+    for g, i in itertools.groupby(tokens, lambda x: x.start[0]):
+        print(g, list(i))
 
     # --------------------------------------------------------------
     # Printing out comment lines to the script will require
     #   the file to be opened with 'read' and 'write' permissions
     # Also include code necessary for identifying the
     #   printed comments
+    # --------------------------------------------------------------
 
     if args.read:
         print("{} is the READ version".format(string_name))
