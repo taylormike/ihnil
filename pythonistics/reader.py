@@ -41,8 +41,8 @@ if file_extension == ".py":
 
     combo_list = [[i, j, k] for i, j, k in zip(rows, row_list, token_list)]
 
-    for g, i in itertools.groupby(tokens, lambda x: x.start[0]):
-        print(g, list(i))
+    full_list = [(g, list(i))
+                 for g, i in itertools.groupby(token, lambda x: x.start[0])]
 
     # --------------------------------------------------------------
     # Printing out comment lines to the script will require
