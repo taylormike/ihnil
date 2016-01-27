@@ -34,10 +34,27 @@ if file_extension == ".py":
                  for g, i in itertools.groupby(tokens, lambda x: x.start[0])]
 
     if_rows = [i[0] for i in full_list if "if" in [j.string for j in i[1]]]
-    
+
     if_nest = [list(map(operator.itemgetter(1), i))
                for g, i in itertools.groupby(enumerate(if_rows),
-               lambda ix: ix[0] - ix[1])]
+                                             lambda ix: ix[0] - ix[1])]
+
+    nest_list = []
+    for row_var in if_nest:
+        if len(row_var) > 1:
+            front = int(row_var[0]) - 1
+            back = int(row_var[len(row_var) - 1]) + 1
+            row_var.insert(0, front)
+            row_var.append(back)
+            nest_list.append(row_var)
+
+    for nest in nest_list:
+        print("Nested loop error {}:".format(nest_list.index(nest) + 1))
+        print("*" * 50)
+        print(nest)
+        print("*" * 50)
+
+    print()
 
     # --------------------------------------------------------------
     # Printing out comment lines to the script will require
