@@ -40,21 +40,25 @@ if file_extension == ".py":
                                              lambda ix: ix[0] - ix[1])]
 
     nest_list = []
+    nest_item = []
     for row_var in if_nest:
         if len(row_var) > 1:
             front = int(row_var[0]) - 1
             back = int(row_var[len(row_var) - 1]) + 1
             row_var.insert(0, front)
             row_var.append(back)
-            nest_list.append(row_var)
+            nest_item.append(row_var)
+            nest_list.append(nest_item)
 
     for nest in nest_list:
         print("Nested loop error {}:".format(nest_list.index(nest) + 1))
         print("*" * 50)
-        print(nest)
+        for n in nest:
+            for i in n:
+                for f in full_list:
+                    if i == f[0]:
+                        print(f[1][0].line.rstrip())
         print("*" * 50)
-
-    print()
 
     # --------------------------------------------------------------
     # Printing out comment lines to the script will require
