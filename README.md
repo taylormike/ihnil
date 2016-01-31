@@ -22,7 +22,7 @@ Currently only available for Python 3.
 
 This project has several phases listed below:  
 - [X] Identify nested loop statements
-- [ ] Print results errors to the terminal
+- [X] Print results errors to the terminal
 - [ ] Parse statements to identify improvements
 - [ ] Print improvements to the terminal
 - [ ] Insert recommendations into the code\
