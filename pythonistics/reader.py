@@ -30,42 +30,31 @@ if file_extension == ".py":
     with tokenize._builtin_open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
 
-    full_list = [(g, list(i))
-                 for g, i in itertools.groupby(tokens, lambda x: x.start[0])]
+    full_dict = {g: list(i)
+                 for g, i in itertools.groupby(tokens, lambda x: x.start[0])}
 
-    if_rows = [i[0] for i in full_list if "if" in [j.string for j in i[1]]]
+    if_rows = [token.start[0] for token in tokens if token.string == "if"]
 
     if_nest = [list(map(operator.itemgetter(1), i))
                for g, i in itertools.groupby(enumerate(if_rows),
                                              lambda ix: ix[0] - ix[1])]
 
     nest_list = []
-    nest_item = []
-    for row_var in if_nest:
-        if len(row_var) > 1:
-            front = int(row_var[0]) - 1
-            back = int(row_var[len(row_var) - 1]) + 1
-            row_var.insert(0, front)
-            row_var.append(back)
-            nest_item.append(row_var)
-            nest_list.append(nest_item)
+    for row_nums in if_nest:
+        if len(row_nums) > 1:
+            front = min(row_nums) - 1
+            back = max(row_nums) + 1
+            row_nums.insert(0, front)
+            row_nums.append(back)
+            nest_list.append(row_nums)
 
     for nest in nest_list:
-        print("Nested loop error {}:".format(nest_list.index(nest) + 1))
-        print("*" * 50)
-        for n in nest:
-            for i in n:
-                for f in full_list:
-                    if i == f[0]:
-                        print(f[1][0].line.rstrip())
-        print("*" * 50)
-
-    # --------------------------------------------------------------
-    # Printing out comment lines to the script will require
-    #   the file to be opened with 'read' and 'write' permissions
-    # Also include code necessary for identifying the
-    #   printed comments
-    # --------------------------------------------------------------
+        print("Nested loop error number {}".format(nest_list.index(nest) + 1))
+        print()
+        for row in nest:
+            if row in full_dict.keys():
+                print("[>   {}".format(full_dict[row][0].line.rstrip()))
+        print()
 
     if args.read:
         print("{} is the READ version".format(string_name))
