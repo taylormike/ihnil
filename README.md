@@ -2,20 +2,35 @@
 
 ## Description
 
-Prounced: "eye-nil"
+Prounced: "eye-nil"  
+For use on Python code modules.  
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.  
 While there are *some* instances where they are necessary, let's see if we  
 can get ride of all of the useless ones.  
 
 ## Usage
 
-After installation, simply run via the below in the command line:  
+After installation, run via with the arguments below in the terminal:  
 
 ```
 python3 reader.py [ -r/--read | -w/--read ] [ -h/--help ] filename  
 ```  
 
 Currently only available for Python 3.  
+
+## Development
+
+This project has several phases listed below:  
+- [X] Identify nested loop statements
+- [ ] Print results errors to the terminal
+- [ ] Parse statements to identify improvements
+- [ ] Print improvements to the terminal
+- [ ] Insert recommendations into the code\
+- [ ] Develop PyPI modularity distribution
+- [ ] Identify unecessary stacked "if" statements (**long term**)
+- [ ] Identify list comprehension options (**longER term**)
+
+Other additions may be made to the list as the project develops.  
 
 ## Contribution
 
@@ -28,6 +43,7 @@ Pull requests will only be accepted through [Github](https://github.com/)
 ## Credits
 
 **John Forstmeier**, *primary author*  
+\- @forstmeier
 
 *Copyright (c) 2015 John Forstmeier*  
 
