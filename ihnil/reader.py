@@ -1,3 +1,20 @@
+"""
+Core Python script parsing module.
+
+Description:
+
+    Prounounced "eye-nil"; this tool allows the user to identify and improve
+    upon nested "if" loop statements.
+
+Arguments:
+
+    file_name       The target file to parse
+    -h, --help      Show help message
+    -r, --read      Displays the errors and location in the terminal
+    -w, --write     Inserts recommended code changes into the script
+
+"""
+
 import argparse
 import os
 import tokenize
@@ -6,7 +23,8 @@ import itertools
 
 
 parser = argparse.ArgumentParser(description="Python code shortener",
-                                 epilog="This is the end")
+                                 epilog="For details see \
+                                         https://github.com/forstmeier/ihnil")
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),

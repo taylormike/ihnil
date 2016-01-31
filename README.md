@@ -42,8 +42,7 @@ Pull requests will only be accepted through [Github](https://github.com/)
 
 ## Credits
 
-**John Forstmeier**, *primary author*  
-\- @forstmeier
+**John Forstmeier**, *primary author*, @forstmeier  
 
 *Copyright (c) 2015 John Forstmeier*  
 
