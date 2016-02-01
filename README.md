@@ -23,14 +23,28 @@ Currently only available for Python 3.
 This project has several phases listed below:  
 - [X] Identify nested loop statements
 - [X] Print results errors to the terminal
+- [X] Add printout for error location values
+- [ ] Improve nested "if" identifier accuracy
+- [ ] Implement class to hold all parsed code & functions
+- [ ] Adjust argparse options to call needed class methods
+- [ ] Function to cut out unecessary lines of target module code
 - [ ] Parse statements to identify improvements
 - [ ] Print improvements to the terminal
-- [ ] Insert recommendations into the code\
+- [ ] Insert recommendations into the code
 - [ ] Develop PyPI modularity distribution
 - [ ] Identify unecessary stacked "if" statements (**long term**)
+- [ ] Implement dictionary lookup for stacked "if"
 - [ ] Identify list comprehension options (**longER term**)
 
 Other additions may be made to the list as the project develops.  
+
+## Dependencies
+
+- [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)
+- [os](https://docs.python.org/3.4/library/os.html#module-os)
+- [tokenize](https://docs.python.org/3.4/library/tokenize.html#module-tokenize)
+- [operator](https://docs.python.org/3.4/library/operator.html#module-operator)
+- [itertools](https://docs.python.org/3.4/library/itertools.html#module-itertools)
 
 ## Contribution
 
