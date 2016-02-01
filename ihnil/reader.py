@@ -42,10 +42,12 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
+COND = {"<", ">", "<=", ">=", "!=", "==", "in", "not in", "is", "is not"}
+
 print()
 
 if file_extension == ".py":
-    with tokenize._builtin_open(args.file_name.name, "rb") as t_file:
+    with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
 
     full_dict = {g: list(i)
@@ -68,20 +70,19 @@ if file_extension == ".py":
 
     for nest in nest_list:
         print("Nested loop error number {}".format(nest_list.index(nest) + 1))
-        print()
+        print("Start line: {}, end line: {}\n".format(min(nest), max(nest)))
         for row in nest:
             if row in full_dict.keys():
                 print("[>   {}".format(full_dict[row][0].line.rstrip()))
-        print()
 
     if args.read:
         print("{} is the READ version".format(string_name))
     elif args.write:
         print("{} is the WRITE version".format(string_name))
     else:
-        print("{} is the OTHER version".format(string_name))
+        print("{} is the NONE version".format(string_name))
 
     print()
 
 else:
-    print("Please enter a Python file")
+    print("Please enter a Python file\n")
