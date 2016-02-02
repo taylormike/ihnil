@@ -20,6 +20,7 @@ import os
 import tokenize
 import operator
 import itertools
+import keyword
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop improver",
@@ -77,6 +78,38 @@ if file_extension == ".py":
 
     if args.write:
         print("{} is the WRITE version".format(string_name))
+
+        eval_list = [full_dict[row] for nest in nest_list for row in nest
+                     if row in full_dict.keys()]
+
+        built_in = [x for x in dir(__builtins__) if x[0].islower()
+                    or x == "True" or x == "False"]
+
+        for e in eval_list:
+            for r in e:
+                if (tokenize.tok_name[r.type] == "NAME"
+                    and r.string not in built_in
+                        and r.string not in keyword.kwlist):
+                    print(r.string)
+
+    # TEST.py problem:
+    # def manyif(val):
+    #    if val > 0:
+    #       if val != 2:
+    #          if val < 3:
+    #             print("Eggs & spam")
+
+    # TEST.py solution:
+    # if 3 > val > 0 and val != 2:
+    #    print("Eggs & spam")
+
+    # greater       >
+    # less          <
+    # greaterequal  >=
+    # lessequal     <=
+    # notequal      !=
+    # equal         ==
+
     else:
         print("{} is the READ version".format(string_name))
 
