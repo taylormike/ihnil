@@ -1,5 +1,5 @@
 """
-Core Python script parsing module.
+Python script parsing module.
 
 Description:
 
@@ -22,7 +22,7 @@ import operator
 import itertools
 
 
-parser = argparse.ArgumentParser(description="Python code shortener",
+parser = argparse.ArgumentParser(description="Python 'if' loop improver",
                                  epilog="For details see \
                                          https://github.com/forstmeier/ihnil")
 
@@ -75,12 +75,10 @@ if file_extension == ".py":
             if row in full_dict.keys():
                 print("[>   {}".format(full_dict[row][0].line.rstrip()))
 
-    if args.read:
-        print("{} is the READ version".format(string_name))
-    elif args.write:
+    if args.write:
         print("{} is the WRITE version".format(string_name))
     else:
-        print("{} is the NONE version".format(string_name))
+        print("{} is the READ version".format(string_name))
 
     print()
 
