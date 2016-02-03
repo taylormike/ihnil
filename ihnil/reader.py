@@ -43,8 +43,6 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
-COND = {"<", ">", "<=", ">=", "!=", "==", "in", "not in", "is", "is not"}
-
 print()
 
 if file_extension == ".py":
@@ -56,30 +54,22 @@ if file_extension == ".py":
 
     if_rows = [token.start[0] for token in tokens if token.string == "if"]
 
-    if_nest = [list(map(operator.itemgetter(1), i))
+    if_nest = [x for x in [list(map(operator.itemgetter(1), i))
                for g, i in itertools.groupby(enumerate(if_rows),
                                              lambda ix: ix[0] - ix[1])]
+               if len(x) > 1]
 
-    nest_list = []
-    for row_nums in if_nest:
-        if len(row_nums) > 1:
-            front = min(row_nums) - 1
-            back = max(row_nums) + 1
-            row_nums.insert(0, front)
-            row_nums.append(back)
-            nest_list.append(row_nums)
-
-    for nest in nest_list:
-        print("Nested loop error number {}".format(nest_list.index(nest) + 1))
+    for nest in if_nest:
+        print("Nested loop error number {}".format(if_nest.index(nest) + 1))
         print("Start line: {}, end line: {}\n".format(min(nest), max(nest)))
         for row in nest:
             if row in full_dict.keys():
                 print("[>   {}".format(full_dict[row][0].line.rstrip()))
 
     if args.write:
-        print("{} is the WRITE version".format(string_name))
+        print("\n{} is the WRITE version".format(string_name))
 
-        eval_list = [full_dict[row] for nest in nest_list for row in nest
+        eval_list = [full_dict[row] for nest in if_nest for row in nest
                      if row in full_dict.keys()]
 
         built_in = [x for x in dir(__builtins__) if x[0].islower()
@@ -111,7 +101,7 @@ if file_extension == ".py":
     # equal         ==
 
     else:
-        print("{} is the READ version".format(string_name))
+        print("\n{} is the READ version".format(string_name))
 
     print()
 
