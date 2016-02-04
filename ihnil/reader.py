@@ -81,14 +81,13 @@ class MainIHNIL(object):
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
+    if args.write:
+        instance = MainIHNIL(tokens)
+        instance._write_out()
+        print("\n{} is the WRITE version\n".format(string_name))
+    else:
+        instance = MainIHNIL(tokens)
+        instance._read_out()
+        print("\n{} is the READ version\n".format(string_name))
 else:
     print("Please enter a Python file\n")
-
-if args.write:
-    instance = MainIHNIL(tokens)
-    instance._write_out()
-    print("\n{} is the WRITE version\n".format(string_name))
-else:
-    instance = MainIHNIL(tokens)
-    instance._read_out()
-    print("\n{} is the READ version\n".format(string_name))
