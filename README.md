@@ -26,8 +26,8 @@ This project has several phases listed below:
 - [X] Print results errors to the terminal
 - [X] Add printout for error location values
 - [ ] Improve nested "if" identifier accuracy
-- [ ] Implement class to hold all parsed code & functions
-- [ ] Adjust argparse options to call needed class methods
+- [X] Implement class to hold all parsed code & functions
+- [X] Adjust argparse options to call needed class methods
 - [ ] Function to cut out unecessary lines of target module code
 - [ ] Parse statements to identify improvements
 - [ ] Print improvements to the terminal
@@ -57,8 +57,8 @@ Pull requests will only be accepted through [Github](https://github.com/)
 
 ## Credits
 
-**John Forstmeier**, *primary author*, @forstmeier  
+**John Forstmeier**, *primary author*, [@forstmeier](https://github.com/forstmeier)  
 
-*Copyright (c) 2015 John Forstmeier*  
+Copyright (c) 2015 John Forstmeier  
 
-*Released under the [MIT License](https://github.com/forstmeier/pythonistics/blob/master/LICENSE.txt)*  
+Released under the [MIT License](https://github.com/forstmeier/pythonistics/blob/master/LICENSE.txt)  
