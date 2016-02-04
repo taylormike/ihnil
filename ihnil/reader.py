@@ -45,38 +45,54 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 class MainIHNIL(object):
-    def __init__(self, tk):
-        self.tk = tk
-        self.if_dict = {g: list(i)
-                        for g, i in itertools.groupby(self.tk,
-                                                      lambda x: x.start[0])}
-        self.rows = [token.start[0] for token in self.tk
-                     if token.string == "if"]
+    """Core object for code parsing and output methods."""
+
+    def __init__(self, inp):
+        """
+        Establish necessary variables.
+
+        self.inp        : tokenized input module code list
+        self.ordr       : dictionary of rows and associated tokens
+        self.rows       : row values of "if" statement tokens
+        self.nest       : list of consecutive row value lists
+        self.toks       : (not used yet)
+        self.blt_in     : (not used yet)
+        """
+        self.inp = inp
+        self.ordr = {grp: list(itm)
+                     for grp, itm in itertools.groupby(self.inp,
+                                                       lambda x: x.start[0])}
+        self.rows = [tkn.start[0] for tkn in self.inp
+                     if tkn.string == "if"]
         self.nest = [lst for lst in
                      [list(map(operator.itemgetter(1), i))
                       for g, i in itertools.groupby(enumerate(self.rows),
                                                     lambda ix: ix[0] - ix[1])]
                      if len(lst) > 1]
-        self.toks = [self.if_dict[row] for n in self.nest for row in n
-                     if row in self.if_dict.keys()]
-        self.blt_in = [x for x in dir(__builtins__) if x[0].islower()
-                       or x == "True" or x == "False"]
+        self.toks = [self.ordr[row] for nst in self.nest for row in nst
+                     if row in self.ordr.keys()]
+        self.blt_in = [blt for blt in dir(__builtins__) if blt[0].islower()
+                       or blt == "True" or blt == "False"]
 
     def _read_out(self):
-        for n in self.nest:
-            print("Nested error number {}".format(self.nest.index(n) + 1))
-            print("Start row: {}, end row: {}\n".format(min(n), max(n)))
-            for row in n:
-                if row in self.if_dict.keys():
-                    print("[>   {}".format(self.if_dict[row][0].line.rstrip()))
+        for nst in self.nest:
+            spaces = 2
+            print("Nested error number {}".format(self.nest.index(nst) + 1))
+            print("Start row: {}, end row: {}\n".format(min(nst), max(nst)))
+            for row in nst:
+                if row in self.ordr.keys():
+                    print("[>{}{}".format(" " * spaces,
+                                          self.ordr[row][0]
+                                          .line.lstrip().rstrip()))
+                spaces += 4
 
     def _write_out(self):
-        for e in self.toks:
-            for r in e:
-                if (tokenize.tok_name[r.type] == "NAME"
-                    and r.string not in self.blt_in
-                        and r.string not in keyword.kwlist):
-                    print(r.string)
+        for lst in self.toks:
+            for row in lst:
+                if (tokenize.tok_name[row.type] == "NAME"
+                    and row.string not in self.blt_in
+                        and row.string not in keyword.kwlist):
+                    print(row.string)
 
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
