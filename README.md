@@ -6,7 +6,7 @@ Prounced: "eye-nil"
 For use on Python code modules.  
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.  
 While there are *some* instances where they are necessary, let's see if we  
-can get ride of all of the useless ones.  
+can get rid of all of the useless ones.  
 
 ## Usage
 
@@ -16,6 +16,7 @@ After installation, run via with the arguments below in the terminal:
 python3 reader.py [ -r/--read | -w/--read ] [ -h/--help ] filename  
 ```  
 
+Default optional argument is ` -r / --read `.  
 Currently only available for Python 3.  
 
 ## Development
@@ -48,7 +49,7 @@ Other additions may be made to the list as the project develops.
 
 ## Contribution
 
-Please adhere to `pep8` standards when contributing to this project.  
+Please adhere to ` pep8 ` standards when contributing to this project.  
 + The official reference **style guide** can be found [here](https://www.python.org/dev/peps/pep-0008/)  
 + The **command line tool** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
 
