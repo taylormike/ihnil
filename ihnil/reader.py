@@ -43,77 +43,52 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
-COND = {"<", ">", "<=", ">=", "!=", "==", "in", "not in", "is", "is not"}
 
-print()
+class MainIHNIL(object):
+    def __init__(self, tk):
+        self.tk = tk
+        self.if_dict = {g: list(i)
+                        for g, i in itertools.groupby(self.tk,
+                                                      lambda x: x.start[0])}
+        self.rows = [token.start[0] for token in self.tk
+                     if token.string == "if"]
+        self.nest = [lst for lst in
+                     [list(map(operator.itemgetter(1), i))
+                      for g, i in itertools.groupby(enumerate(self.rows),
+                                                    lambda ix: ix[0] - ix[1])]
+                     if len(lst) > 1]
+        self.toks = [self.if_dict[row] for n in self.nest for row in n
+                     if row in self.if_dict.keys()]
+        self.blt_in = [x for x in dir(__builtins__) if x[0].islower()
+                       or x == "True" or x == "False"]
+
+    def _read_out(self):
+        for n in self.nest:
+            print("Nested error number {}".format(self.nest.index(n) + 1))
+            print("Start row: {}, end row: {}\n".format(min(n), max(n)))
+            for row in n:
+                if row in self.if_dict.keys():
+                    print("[>   {}".format(self.if_dict[row][0].line.rstrip()))
+
+    def _write_out(self):
+        for e in self.toks:
+            for r in e:
+                if (tokenize.tok_name[r.type] == "NAME"
+                    and r.string not in self.blt_in
+                        and r.string not in keyword.kwlist):
+                    print(r.string)
 
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
-
-    full_dict = {g: list(i)
-                 for g, i in itertools.groupby(tokens, lambda x: x.start[0])}
-
-    if_rows = [token.start[0] for token in tokens if token.string == "if"]
-
-    if_nest = [list(map(operator.itemgetter(1), i))
-               for g, i in itertools.groupby(enumerate(if_rows),
-                                             lambda ix: ix[0] - ix[1])]
-
-    nest_list = []
-    for row_nums in if_nest:
-        if len(row_nums) > 1:
-            front = min(row_nums) - 1
-            back = max(row_nums) + 1
-            row_nums.insert(0, front)
-            row_nums.append(back)
-            nest_list.append(row_nums)
-
-    for nest in nest_list:
-        print("Nested loop error number {}".format(nest_list.index(nest) + 1))
-        print("Start line: {}, end line: {}\n".format(min(nest), max(nest)))
-        for row in nest:
-            if row in full_dict.keys():
-                print("[>   {}".format(full_dict[row][0].line.rstrip()))
-
-    if args.write:
-        print("{} is the WRITE version".format(string_name))
-
-        eval_list = [full_dict[row] for nest in nest_list for row in nest
-                     if row in full_dict.keys()]
-
-        built_in = [x for x in dir(__builtins__) if x[0].islower()
-                    or x == "True" or x == "False"]
-
-        for e in eval_list:
-            for r in e:
-                if (tokenize.tok_name[r.type] == "NAME"
-                    and r.string not in built_in
-                        and r.string not in keyword.kwlist):
-                    print(r.string)
-
-    # TEST.py problem:
-    # def manyif(val):
-    #    if val > 0:
-    #       if val != 2:
-    #          if val < 3:
-    #             print("Eggs & spam")
-
-    # TEST.py solution:
-    # if 3 > val > 0 and val != 2:
-    #    print("Eggs & spam")
-
-    # greater       >
-    # less          <
-    # greaterequal  >=
-    # lessequal     <=
-    # notequal      !=
-    # equal         ==
-
-    else:
-        print("{} is the READ version".format(string_name))
-
-    print()
-
 else:
     print("Please enter a Python file\n")
+
+if args.write:
+    instance = MainIHNIL(tokens)
+    instance._write_out()
+    print("\n{} is the WRITE version\n".format(string_name))
+else:
+    instance = MainIHNIL(tokens)
+    instance._read_out()
+    print("\n{} is the READ version\n".format(string_name))
