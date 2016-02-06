@@ -29,7 +29,7 @@ parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),
-                    help="Input file for %(prog)s optimization")
+                    help="input file for %(prog)s optimization")
 
 output = parser.add_mutually_exclusive_group()
 output.add_argument("-r", "--read",
@@ -57,6 +57,7 @@ class MainIHNIL(object):
         self.nest       : list of consecutive row value lists
         self.toks       : (not used yet)
         self.excl       : (not used yet)
+        self.incl       : (not used yet)
         self.cond       : (not used yet)
         """
         self.inp = inp
@@ -73,6 +74,9 @@ class MainIHNIL(object):
         self.toks = [self.ordr[row] for nst in self.nest for row in nst
                      if row in self.ordr.keys()]
         self.excl = set(keyword.kwlist + dir(__builtins__))
+        self.incl = {"<": "LESS", ">": "GREATER",
+                     "<=": "LESSEQUAL", ">=": "GREATEREQUAL",
+                     "!=": "NOTEQUAL", "==": "EQEQUAL"}
         self.cond = ["<", ">", "<=", ">=", "!=", "=="]
 
     def _read_out(self):
@@ -91,7 +95,7 @@ class MainIHNIL(object):
         print()
         for lst in self.toks:
             for row in lst:
-                if (tokenize.tok_name[row.type] == "NAME"
+                if (tokenize.tok_name[row.exact_type] == "NAME"
                         and row.string not in self.excl):
                     print(row.string)
 
@@ -113,4 +117,4 @@ if file_extension == ".py":
         instance._else_out()
         print("\n{} is the ELSE version\n".format(string_name))
 else:
-    print("Please enter a Python file\n")
+    print("\nPlease enter a Python file\n")
