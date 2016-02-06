@@ -51,14 +51,13 @@ class MainIHNIL(object):
         """
         Establish necessary variables.
 
-        self.inp        : tokenized input module code list
+        self.inp        : list of tokenized input module code
         self.ordr       : dictionary of rows and associated tokens
-        self.rows       : row values of "if" statement tokens
+        self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
         self.toks       : (not used yet)
         self.excl       : (not used yet)
         self.incl       : (not used yet)
-        self.cond       : (not used yet)
         """
         self.inp = inp
         self.ordr = {grp: list(itm)
@@ -71,13 +70,12 @@ class MainIHNIL(object):
                       for g, i in itertools.groupby(enumerate(self.rows),
                                                     lambda ix: ix[0] - ix[1])]
                      if len(lst) > 1]
-        self.toks = [self.ordr[row] for nst in self.nest for row in nst
-                     if row in self.ordr.keys()]
+        self.toks = [[self.ordr[val] for val in nst for dct in self.ordr
+                     if val == dct] for nst in self.nest]
         self.excl = set(keyword.kwlist + dir(__builtins__))
         self.incl = {"<": "LESS", ">": "GREATER",
                      "<=": "LESSEQUAL", ">=": "GREATEREQUAL",
                      "!=": "NOTEQUAL", "==": "EQEQUAL"}
-        self.cond = ["<", ">", "<=", ">=", "!=", "=="]
 
     def _read_out(self):
         for nst in self.nest:
@@ -92,12 +90,7 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
-        print()
-        for lst in self.toks:
-            for row in lst:
-                if (tokenize.tok_name[row.exact_type] == "NAME"
-                        and row.string not in self.excl):
-                    print(row.string)
+        print(len(self.toks))
 
     def _else_out(self):
         for nst in self.nest:
