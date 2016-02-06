@@ -25,16 +25,16 @@ This project has several phases listed below:
 - [X] Identify nested loop statements
 - [X] Print results errors to the terminal
 - [X] Add printout for error location values
-- [ ] Improve nested "if" identifier accuracy
 - [X] Implement class to hold all parsed code & functions
 - [X] Adjust argparse options to call needed class methods
-- [ ] Function to cut out unecessary lines of target module code
-- [ ] Parse statements to identify improvements
+- [ ] Parse "if" statements to identify improvements
+- [ ] Improve nested "if" identifier accuracy
+- [ ] Function to remove comment lines (to ID nested "if"s)
 - [ ] Print improvements to the terminal
 - [ ] Insert recommendations into the code
-- [ ] Develop PyPI modularity distribution
+- [ ] Build auto editor for recommendations
+- [ ] Develop PyPI distribution
 - [ ] Identify unecessary stacked "if" statements (**long term**)
-- [ ] Implement dictionary lookup for stacked "if"
 - [ ] Identify list comprehension options (**longER term**)
 
 Other additions may be made to the list as the project develops.  

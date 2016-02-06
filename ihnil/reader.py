@@ -56,7 +56,8 @@ class MainIHNIL(object):
         self.rows       : row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
         self.toks       : (not used yet)
-        self.blt_in     : (not used yet)
+        self.excl       : (not used yet)
+        self.cond       : (not used yet)
         """
         self.inp = inp
         self.ordr = {grp: list(itm)
@@ -71,8 +72,8 @@ class MainIHNIL(object):
                      if len(lst) > 1]
         self.toks = [self.ordr[row] for nst in self.nest for row in nst
                      if row in self.ordr.keys()]
-        self.blt_in = [blt for blt in dir(__builtins__) if blt[0].islower()
-                       or blt == "True" or blt == "False"]
+        self.excl = set(keyword.kwlist + dir(__builtins__))
+        self.cond = ["<", ">", "<=", ">=", "!=", "=="]
 
     def _read_out(self):
         for nst in self.nest:
@@ -91,20 +92,25 @@ class MainIHNIL(object):
         for lst in self.toks:
             for row in lst:
                 if (tokenize.tok_name[row.type] == "NAME"
-                    and row.string not in self.blt_in
-                        and row.string not in keyword.kwlist):
+                        and row.string not in self.excl):
                     print(row.string)
+
+    def _else_out(self):
+        for nst in self.nest:
+            print("Start row: {}, end row: {}".format(min(nst), max(nst)))
 
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
-    if args.write:
-        instance = MainIHNIL(tokens)
+    instance = MainIHNIL(tokens)
+    if args.read:
+        instance._read_out()
+        print("\n{} is the READ version\n".format(string_name))
+    elif args.write:
         instance._write_out()
         print("\n{} is the WRITE version\n".format(string_name))
     else:
-        instance = MainIHNIL(tokens)
-        instance._read_out()
-        print("\n{} is the READ version\n".format(string_name))
+        instance._else_out()
+        print("\n{} is the ELSE version\n".format(string_name))
 else:
     print("Please enter a Python file\n")
