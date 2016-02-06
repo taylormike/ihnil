@@ -50,8 +50,8 @@ Other additions may be made to the list as the project develops.
 ## Contribution
 
 Please adhere to ` pep8 ` standards when contributing to this project.  
-+ The official reference **style guide** can be found [here](https://www.python.org/dev/peps/pep-0008/)  
-+ The **command line tool** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
+- The official reference **style guide** can be found [here](https://www.python.org/dev/peps/pep-0008/)  
+- The **command line tool** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
 
 Pull requests will only be accepted through [Github](https://github.com/)  
 
@@ -59,6 +59,6 @@ Pull requests will only be accepted through [Github](https://github.com/)
 
 **John Forstmeier**, *primary author*, [@forstmeier](https://github.com/forstmeier)  
 
-Copyright (c) 2015 John Forstmeier  
+Copyright (c) 2015-2016 John Forstmeier  
 
 Released under the [MIT License](https://github.com/forstmeier/pythonistics/blob/master/LICENSE.txt)  

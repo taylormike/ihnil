@@ -23,21 +23,21 @@ import itertools
 import keyword
 
 
-parser = argparse.ArgumentParser(description="Python 'if' loop improver",
+parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
                                  epilog="For details see \
                                          https://github.com/forstmeier/ihnil")
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),
-                    help="Temporary %(prog)s POSITIONAL help string")
+                    help="Input file for %(prog)s optimization")
 
 output = parser.add_mutually_exclusive_group()
 output.add_argument("-r", "--read",
                     action="store_true",
-                    help="Temporary READ help string")
+                    help="find and print 'if' loop errors to the terminal")
 output.add_argument("-w", "--write",
                     action="store_true",
-                    help="Temporary WRITE help string")
+                    help="write 'if' alternatives to the module and terminal")
 
 args = parser.parse_args()
 string_name = str(args.file_name.name)
@@ -87,6 +87,7 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
+        print()
         for lst in self.toks:
             for row in lst:
                 if (tokenize.tok_name[row.type] == "NAME"
