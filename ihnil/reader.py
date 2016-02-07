@@ -92,12 +92,11 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
-        pass
-        # for tok in self.toks
-        # for ln in tok
-        # evaluate each token in ln
-        # ignore indent/colon/newline names
-        # select -> cond/indt/string/list/etc.
+        for grp in self.toks:
+            for lst in grp:
+                for tkn in lst:
+                    if tkn.string not in set(self.kwds + self.bltn):
+                        print(tkn.string)
 
     def _else_out(self):
         for nst in self.nest:
