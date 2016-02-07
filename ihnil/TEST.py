@@ -28,3 +28,9 @@ class Basic():
     # Here is another comment
     def printr(self, val):
         print("The input value is " + str(val))
+
+# TODO:
+# def anotherif(inp):
+#     if isinstance(inp, str):
+#         if inp.find("John"):
+#             print("Text found")
