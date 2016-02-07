@@ -47,24 +47,24 @@ file_extension = os.path.splitext(string_name)[1]
 class MainIHNIL(object):
     """Core object for code parsing and output methods."""
 
-    def __init__(self, inp):
+    def __init__(self, inpt):
         """
         Establish necessary variables.
 
-        self.inp        : list of 5-tuple tokenized input module code
+        self.inpt       : list of 5-tuple tokenized input module code
         self.ordr       : dictionary of rows and associated tokens
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
         self.kwds       : (not used yet)
         self.bltn       : (not used yet)
         self.cond       : (not used yet)
-        self.ngtv       : (not used yet)
+        self.idnt       : (not used yet)
         """
-        self.inp = inp
+        self.inpt = inpt
         self.ordr = {grp: list(itm)
-                     for grp, itm in itertools.groupby(self.inp,
+                     for grp, itm in itertools.groupby(self.inpt,
                                                        lambda x: x.start[0])}
-        self.rows = [tkn.start[0] for tkn in self.inp
+        self.rows = [tkn.start[0] for tkn in self.inpt
                      if tkn.string == "if"]
         self.nest = [lst for lst in
                      [list(map(operator.itemgetter(1), i))
@@ -91,13 +91,8 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
-        toks = [[self.ordr[val] for val in nst for dct in self.ordr
-                if val == dct] for nst in self.nest]
-        for grp in toks:
-            for lst in grp:
-                for tkn in lst:
-                    if tkn.string not in set(self.kwds + self.bltn):
-                        print(tkn.string)
+        strings = [[tok.string for tok in self.ordr[row]] for row in self.ordr
+                   for nst in self.nest for ln in nst if ln == row]
 
     def _else_out(self):
         for nst in self.nest:
