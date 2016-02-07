@@ -23,87 +23,97 @@ import itertools
 import keyword
 
 
-parser = argparse.ArgumentParser(description="Python 'if' loop improver",
+parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
                                  epilog="For details see \
                                          https://github.com/forstmeier/ihnil")
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),
-                    help="Temporary %(prog)s POSITIONAL help string")
+                    help="input file for %(prog)s optimization")
 
 output = parser.add_mutually_exclusive_group()
 output.add_argument("-r", "--read",
                     action="store_true",
-                    help="Temporary READ help string")
+                    help="find and print 'if' loop errors to the terminal")
 output.add_argument("-w", "--write",
                     action="store_true",
-                    help="Temporary WRITE help string")
+                    help="write 'if' alternatives to the module and terminal")
 
 args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
-print()
+
+class MainIHNIL(object):
+    """Core object for code parsing and output methods."""
+
+    def __init__(self, inp):
+        """
+        Establish necessary variables.
+
+        self.inp        : list of 5-tuple tokenized input module code
+        self.ordr       : dictionary of rows and associated tokens
+        self.rows       : list of row values of "if" statement tokens
+        self.nest       : list of consecutive row value lists
+        self.toks       : list of grouped token 5-tuples
+        self.kwds       : (not used yet)
+        self.bltn       : (not used yet)
+        self.cond       : (not used yet)
+        self.ngtv       : (not used yet)
+        """
+        self.inp = inp
+        self.ordr = {grp: list(itm)
+                     for grp, itm in itertools.groupby(self.inp,
+                                                       lambda x: x.start[0])}
+        self.rows = [tkn.start[0] for tkn in self.inp
+                     if tkn.string == "if"]
+        self.nest = [lst for lst in
+                     [list(map(operator.itemgetter(1), i))
+                      for g, i in itertools.groupby(enumerate(self.rows),
+                                                    lambda ix: ix[0] - ix[1])]
+                     if len(lst) > 1]
+        self.toks = [[self.ordr[val] for val in nst for dct in self.ordr
+                     if val == dct] for nst in self.nest]
+        self.kwds = keyword.kwlist
+        self.bltn = dir(__builtins__)
+        self.cond = ["<", ">", "<=", ">=", "!=", "=="]
+        self.idnt = ["not", "is", "is not", "in", "not in"]
+
+    def _read_out(self):
+        for grp in self.toks:
+            spaces = 2
+            start = grp[0][0].start[0]
+            end = grp[-1][0].start[0]
+            print("Nested error number {}".format(self.toks.index(grp) + 1))
+            print("Start row: {}, end row: {}\n".format(start, end))
+            for row in grp:
+                print("[>{}{}".format(" " * spaces,
+                                      row[0].line.lstrip().rstrip()))
+                spaces += 4
+
+    def _write_out(self):
+        for grp in self.toks:
+            for lst in grp:
+                for tkn in lst:
+                    if tkn.string not in set(self.kwds + self.bltn):
+                        print(tkn.string)
+
+    def _else_out(self):
+        for nst in self.nest:
+            print("Start row: {}, end row: {}".format(min(nst), max(nst)))
 
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
-
-    full_dict = {g: list(i)
-                 for g, i in itertools.groupby(tokens, lambda x: x.start[0])}
-
-    if_rows = [token.start[0] for token in tokens if token.string == "if"]
-
-    if_nest = [x for x in [list(map(operator.itemgetter(1), i))
-               for g, i in itertools.groupby(enumerate(if_rows),
-                                             lambda ix: ix[0] - ix[1])]
-               if len(x) > 1]
-
-    for nest in if_nest:
-        print("Nested loop error number {}".format(if_nest.index(nest) + 1))
-        print("Start line: {}, end line: {}\n".format(min(nest), max(nest)))
-        for row in nest:
-            if row in full_dict.keys():
-                print("[>   {}".format(full_dict[row][0].line.rstrip()))
-
-    if args.write:
-        print("\n{} is the WRITE version".format(string_name))
-
-        eval_list = [full_dict[row] for nest in if_nest for row in nest
-                     if row in full_dict.keys()]
-
-        built_in = [x for x in dir(__builtins__) if x[0].islower()
-                    or x == "True" or x == "False"]
-
-        for e in eval_list:
-            for r in e:
-                if (tokenize.tok_name[r.type] == "NAME"
-                    and r.string not in built_in
-                        and r.string not in keyword.kwlist):
-                    print(r.string)
-
-    # TEST.py problem:
-    # def manyif(val):
-    #    if val > 0:
-    #       if val != 2:
-    #          if val < 3:
-    #             print("Eggs & spam")
-
-    # TEST.py solution:
-    # if 3 > val > 0 and val != 2:
-    #    print("Eggs & spam")
-
-    # greater       >
-    # less          <
-    # greaterequal  >=
-    # lessequal     <=
-    # notequal      !=
-    # equal         ==
-
+    instance = MainIHNIL(tokens)
+    if args.read:
+        instance._read_out()
+        print("\n{} is the READ version\n".format(string_name))
+    elif args.write:
+        instance._write_out()
+        print("\n{} is the WRITE version\n".format(string_name))
     else:
-        print("\n{} is the READ version".format(string_name))
-
-    print()
-
+        instance._else_out()
+        print("\n{} is the ELSE version\n".format(string_name))
 else:
-    print("Please enter a Python file\n")
+    print("\nPlease enter a Python file\n")
