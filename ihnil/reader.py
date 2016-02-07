@@ -55,10 +55,6 @@ class MainIHNIL(object):
         self.ordr       : dictionary of rows and associated tokens
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
-        self.kwds       : (not used yet)
-        self.bltn       : (not used yet)
-        self.cond       : (not used yet)
-        self.idnt       : (not used yet)
         """
         self.inpt = inpt
         self.ordr = {grp: list(itm)
@@ -71,10 +67,6 @@ class MainIHNIL(object):
                       for g, i in itertools.groupby(enumerate(self.rows),
                                                     lambda ix: ix[0] - ix[1])]
                      if len(lst) > 1]
-        self.kwds = keyword.kwlist
-        self.bltn = dir(__builtins__)
-        self.cond = ["<", ">", "<=", ">=", "!=", "=="]
-        self.idnt = ["not", "is", "is not", "in", "not in"]
 
     def _read_out(self):
         lines = [[(dct, self.ordr[val][0].line.rstrip().lstrip())
@@ -91,17 +83,34 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
-        strings = [[tok.string for tok in self.ordr[row]] for row in self.ordr
-                   for nst in self.nest for ln in nst if ln == row]
+        kwds = keyword.kwlist
+
+        cond = ["<", ">", "<=", ">=", "!=", "=="]
+        idnt = ["not", "is", "is not", "in", "not in"]
+
+        bltn_func = [var for var in dir(__builtins__) if "__" not in var]
+        stng_func = [var for var in dir(__builtins__.str) if "__" not in var]
+        lsts_func = [var for var in dir(__builtins__.list) if "__" not in var]
+
+        combo = [[[(tok.string, tokenize.tok_name[tok.exact_type])
+                 for tok in self.ordr[dct]]
+                 for val in nst for dct in self.ordr
+                 if val == dct] for nst in self.nest]
+        for grp in combo:
+            for row in grp:
+                for itm in row:
+                    print(itm[0])
 
     def _else_out(self):
         for nst in self.nest:
+            print("Nested error number {}".format(self.nest.index(nst) + 1))
             print("Start row: {}, end row: {}".format(min(nst), max(nst)))
 
 if file_extension == ".py":
     with open(args.file_name.name, "rb") as t_file:
         tokens = list(tokenize.tokenize(t_file.readline))
     instance = MainIHNIL(tokens)
+
     if args.read:
         instance._read_out()
         print("\n{} is the READ version\n".format(string_name))
