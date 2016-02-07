@@ -51,11 +51,11 @@ class MainIHNIL(object):
         """
         Establish necessary variables.
 
-        self.inp        : list of tokenized input module code
+        self.inp        : list of 5-tuple tokenized input module code
         self.ordr       : dictionary of rows and associated tokens
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
-        self.toks       : (not used yet)
+        self.toks       : list of grouped token 5-tuples
         self.kwds       : (not used yet)
         self.bltn       : (not used yet)
         self.cond       : (not used yet)
@@ -80,19 +80,24 @@ class MainIHNIL(object):
         self.idnt = ["not", "is", "is not", "in", "not in"]
 
     def _read_out(self):
-        for nst in self.nest:
+        for grp in self.toks:
             spaces = 2
-            print("Nested error number {}".format(self.nest.index(nst) + 1))
-            print("Start row: {}, end row: {}\n".format(min(nst), max(nst)))
-            for row in nst:
-                if row in self.ordr.keys():
-                    print("[>{}{}".format(" " * spaces,
-                                          self.ordr[row][0]
-                                          .line.lstrip().rstrip()))
+            start = grp[0][0].start[0]
+            end = grp[-1][0].start[0]
+            print("Nested error number {}".format(self.toks.index(grp) + 1))
+            print("Start row: {}, end row: {}\n".format(start, end))
+            for row in grp:
+                print("[>{}{}".format(" " * spaces,
+                                      row[0].line.lstrip().rstrip()))
                 spaces += 4
 
     def _write_out(self):
         pass
+        # for tok in self.toks
+        # for ln in tok
+        # evaluate each token in ln
+        # ignore indent/colon/newline names
+        # select -> cond/indt/string/list/etc.
 
     def _else_out(self):
         for nst in self.nest:
