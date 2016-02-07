@@ -55,7 +55,6 @@ class MainIHNIL(object):
         self.ordr       : dictionary of rows and associated tokens
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
-        self.toks       : list of grouped token 5-tuples
         self.kwds       : (not used yet)
         self.bltn       : (not used yet)
         self.cond       : (not used yet)
@@ -72,27 +71,29 @@ class MainIHNIL(object):
                       for g, i in itertools.groupby(enumerate(self.rows),
                                                     lambda ix: ix[0] - ix[1])]
                      if len(lst) > 1]
-        self.toks = [[self.ordr[val] for val in nst for dct in self.ordr
-                     if val == dct] for nst in self.nest]
         self.kwds = keyword.kwlist
         self.bltn = dir(__builtins__)
         self.cond = ["<", ">", "<=", ">=", "!=", "=="]
         self.idnt = ["not", "is", "is not", "in", "not in"]
 
     def _read_out(self):
-        for grp in self.toks:
+        lines = [[(dct, self.ordr[val][0].line.rstrip().lstrip())
+                 for val in nst for dct in self.ordr
+                 if val == dct] for nst in self.nest]
+        for grp in lines:
             spaces = 2
-            start = grp[0][0].start[0]
-            end = grp[-1][0].start[0]
-            print("Nested error number {}".format(self.toks.index(grp) + 1))
+            start = grp[0][0]
+            end = grp[-1][0]
+            print("Nested error number {}".format(lines.index(grp) + 1))
             print("Start row: {}, end row: {}\n".format(start, end))
             for row in grp:
-                print("[>{}{}".format(" " * spaces,
-                                      row[0].line.lstrip().rstrip()))
+                print("[>{}{}".format(" " * spaces, row[1]))
                 spaces += 4
 
     def _write_out(self):
-        for grp in self.toks:
+        toks = [[self.ordr[val] for val in nst for dct in self.ordr
+                if val == dct] for nst in self.nest]
+        for grp in toks:
             for lst in grp:
                 for tkn in lst:
                     if tkn.string not in set(self.kwds + self.bltn):
