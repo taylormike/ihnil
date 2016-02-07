@@ -32,6 +32,8 @@ This project has several phases listed below:
 - [ ] Function to remove comment lines (to ID nested "if"s)
 - [ ] Print improvements to the terminal
 - [ ] Insert recommendations into the code
+- [ ] Include string method identification support
+- [ ] Include list method identification support
 - [ ] Build auto editor for recommendations
 - [ ] Develop PyPI distribution
 - [ ] Identify unecessary stacked "if" statements (**long term**)

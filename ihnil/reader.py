@@ -56,8 +56,10 @@ class MainIHNIL(object):
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
         self.toks       : (not used yet)
-        self.excl       : (not used yet)
-        self.incl       : (not used yet)
+        self.kwds       : (not used yet)
+        self.bltn       : (not used yet)
+        self.cond       : (not used yet)
+        self.ngtv       : (not used yet)
         """
         self.inp = inp
         self.ordr = {grp: list(itm)
@@ -72,10 +74,10 @@ class MainIHNIL(object):
                      if len(lst) > 1]
         self.toks = [[self.ordr[val] for val in nst for dct in self.ordr
                      if val == dct] for nst in self.nest]
-        self.excl = set(keyword.kwlist + dir(__builtins__))
-        self.incl = {"<": "LESS", ">": "GREATER",
-                     "<=": "LESSEQUAL", ">=": "GREATEREQUAL",
-                     "!=": "NOTEQUAL", "==": "EQEQUAL"}
+        self.kwds = keyword.kwlist
+        self.bltn = dir(__builtins__)
+        self.cond = ["<", ">", "<=", ">=", "!=", "=="]
+        self.idnt = ["not", "is", "is not", "in", "not in"]
 
     def _read_out(self):
         for nst in self.nest:
@@ -90,7 +92,7 @@ class MainIHNIL(object):
                 spaces += 4
 
     def _write_out(self):
-        print(len(self.toks))
+        pass
 
     def _else_out(self):
         for nst in self.nest:
