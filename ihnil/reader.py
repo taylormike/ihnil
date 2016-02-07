@@ -47,56 +47,52 @@ file_extension = os.path.splitext(string_name)[1]
 class MainIHNIL(object):
     """Core object for code parsing and output methods."""
 
-    def __init__(self, inp):
+    def __init__(self, inpt):
         """
         Establish necessary variables.
 
-        self.inp        : list of 5-tuple tokenized input module code
+        self.inpt       : list of 5-tuple tokenized input module code
         self.ordr       : dictionary of rows and associated tokens
         self.rows       : list of row values of "if" statement tokens
         self.nest       : list of consecutive row value lists
-        self.toks       : list of grouped token 5-tuples
         self.kwds       : (not used yet)
         self.bltn       : (not used yet)
         self.cond       : (not used yet)
-        self.ngtv       : (not used yet)
+        self.idnt       : (not used yet)
         """
-        self.inp = inp
+        self.inpt = inpt
         self.ordr = {grp: list(itm)
-                     for grp, itm in itertools.groupby(self.inp,
+                     for grp, itm in itertools.groupby(self.inpt,
                                                        lambda x: x.start[0])}
-        self.rows = [tkn.start[0] for tkn in self.inp
+        self.rows = [tkn.start[0] for tkn in self.inpt
                      if tkn.string == "if"]
         self.nest = [lst for lst in
                      [list(map(operator.itemgetter(1), i))
                       for g, i in itertools.groupby(enumerate(self.rows),
                                                     lambda ix: ix[0] - ix[1])]
                      if len(lst) > 1]
-        self.toks = [[self.ordr[val] for val in nst for dct in self.ordr
-                     if val == dct] for nst in self.nest]
         self.kwds = keyword.kwlist
         self.bltn = dir(__builtins__)
         self.cond = ["<", ">", "<=", ">=", "!=", "=="]
         self.idnt = ["not", "is", "is not", "in", "not in"]
 
     def _read_out(self):
-        for grp in self.toks:
+        lines = [[(dct, self.ordr[val][0].line.rstrip().lstrip())
+                 for val in nst for dct in self.ordr
+                 if val == dct] for nst in self.nest]
+        for grp in lines:
             spaces = 2
-            start = grp[0][0].start[0]
-            end = grp[-1][0].start[0]
-            print("Nested error number {}".format(self.toks.index(grp) + 1))
+            start = grp[0][0]
+            end = grp[-1][0]
+            print("Nested error number {}".format(lines.index(grp) + 1))
             print("Start row: {}, end row: {}\n".format(start, end))
             for row in grp:
-                print("[>{}{}".format(" " * spaces,
-                                      row[0].line.lstrip().rstrip()))
+                print("[>{}{}".format(" " * spaces, row[1]))
                 spaces += 4
 
     def _write_out(self):
-        for grp in self.toks:
-            for lst in grp:
-                for tkn in lst:
-                    if tkn.string not in set(self.kwds + self.bltn):
-                        print(tkn.string)
+        strings = [[tok.string for tok in self.ordr[row]] for row in self.ordr
+                   for nst in self.nest for ln in nst if ln == row]
 
     def _else_out(self):
         for nst in self.nest:
