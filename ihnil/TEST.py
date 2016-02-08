@@ -29,8 +29,7 @@ class Basic():
     def printr(self, val):
         print("The input value is " + str(val))
 
-# TODO:
-# def anotherif(inp):
-#     if isinstance(inp, str):
-#         if inp.find("John"):
-#             print("Text found")
+def listif(inp):
+    if inp % 2 == 0:
+        if inp is in [1, 2, 3, 4, 5]:
+            print(inp)

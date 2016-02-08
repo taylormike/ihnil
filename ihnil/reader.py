@@ -81,12 +81,12 @@ class MainIHNIL(object):
             for row in grp:
                 print("[>{}{}".format(" " * spaces, row[1]))
                 spaces += 4
+            print()
 
     def _write_out(self):
         kwds = keyword.kwlist
 
         cond = ["<", ">", "<=", ">=", "!=", "=="]
-        idnt = ["not", "is", "is not", "in", "not in"]
 
         bltn_func = [var for var in dir(__builtins__) if "__" not in var]
         stng_func = [var for var in dir(__builtins__.str) if "__" not in var]
@@ -113,12 +113,9 @@ if file_extension == ".py":
 
     if args.read:
         instance._read_out()
-        print("\n{} is the READ version\n".format(string_name))
     elif args.write:
         instance._write_out()
-        print("\n{} is the WRITE version\n".format(string_name))
     else:
         instance._else_out()
-        print("\n{} is the ELSE version\n".format(string_name))
 else:
     print("\nPlease enter a Python file\n")
