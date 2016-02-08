@@ -3,7 +3,7 @@
 ## Description
 
 Prounced: "eye-nil"  
-For use on Python code modules.  
+For use on Python code modules. :snake:  
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.  
 While there are *some* instances where they are necessary, let's see if we  
 can get rid of all of the useless ones.  
