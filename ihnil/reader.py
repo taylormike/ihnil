@@ -79,29 +79,37 @@ class MainIHNIL(object):
             print("Nested error number {}".format(lines.index(grp) + 1))
             print("Start row: {}, end row: {}\n".format(start, end))
             for row in grp:
-                print("[>{}{}".format(" " * spaces, row[1]))
+                print("{}{}{}".format(str(start) + ".", " " * spaces, row[1]))
+                start += 1
                 spaces += 4
             print()
 
     def _write_out(self):
-        kwds = keyword.kwlist
+        kwds_list = keyword.kwlist
+        cond_list = ["<", ">", "<=", ">=", "!=", "=="]
+        idnt_list = ["not in", "is not"]
+        bltn_list = [var for var in dir(__builtins__) if "__" not in var]
+        stng_list = [var for var in dir(__builtins__.str) if "__" not in var]
+        lsts_list = [var for var in dir(__builtins__.list) if "__" not in var]
 
-        cond = ["<", ">", "<=", ">=", "!=", "=="]
-
-        bltn_func = [var for var in dir(__builtins__) if "__" not in var]
-        stng_func = [var for var in dir(__builtins__.str) if "__" not in var]
-        lsts_func = [var for var in dir(__builtins__.list) if "__" not in var]
-
-        combo = [[[(tok.string, tokenize.tok_name[tok.exact_type])
-                 for tok in self.ordr[dct]]
+        combo = [[[(tok.string, tokenize.tok_name[tok.exact_type],
+                 nst.index(val), self.ordr[dct].index(tok))
+                 for tok in self.ordr[dct]
+                 if tokenize.tok_name[tok.exact_type]
+                 not in ["INDENT", "NEWLINE"]
+                 if tok.string not in ["if", ":"]]
                  for val in nst for dct in self.ordr
                  if val == dct] for nst in self.nest]
 
         for grp in combo:
             for row in grp:
                 for itm in row:
-                    if itm[1] == "NAME" and itm[0] not in kwds:
-                        print(itm)
+                    if itm[1] == "NAME":
+                        print(itm[0])
+
+        # format    -> bltn_list & stng_list
+        # count     -> stng_list & lsts_list
+        # index     -> stng_list & lsts_list
 
     def _else_out(self):
         for nst in self.nest:
