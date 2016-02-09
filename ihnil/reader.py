@@ -86,6 +86,7 @@ class MainIHNIL(object):
 
     def _write_out(self):
         kwds_list = keyword.kwlist
+        numb_list = '0123456789'
         cond_list = ["<", ">", "<=", ">=", "!=", "=="]
         idnt_list = ["not in", "is not"]
         bltn_list = [var for var in dir(__builtins__) if "__" not in var]
@@ -101,11 +102,24 @@ class MainIHNIL(object):
                  for val in nst for dct in self.ordr
                  if val == dct] for nst in self.nest]
 
+        numb_sort, cond_sort, bltn_sort, user_sort = [], [], [], []
+
         for grp in combo:
             for row in grp:
                 for itm in row:
-                    if itm[1] == "NAME":
-                        print(itm[0])
+                    if itm[0] in cond_list:
+                        cond_sort.append(itm)
+                    elif itm[0] in numb_list:
+                        numb_sort.append(itm)
+                    elif itm[0] in bltn_list:
+                        bltn_sort.append(itm)
+                    else:
+                        user_sort.append(itm)              
+
+        print("COND", cond_sort)
+        print("NUMB", numb_sort)
+        print("BLTN", bltn_sort)
+        print("USER", user_sort)
 
         # format    -> bltn_list & stng_list
         # count     -> stng_list & lsts_list
