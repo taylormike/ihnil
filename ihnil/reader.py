@@ -79,7 +79,8 @@ class MainIHNIL(object):
             print("Nested error number {}".format(lines.index(grp) + 1))
             print("Start row: {}, end row: {}\n".format(start, end))
             for row in grp:
-                print("[>{}{}".format(" " * spaces, row[1]))
+                print("{}{}{}".format(str(start) + ".", " " * spaces, row[1]))
+                start += 1
                 spaces += 4
             print()
 
@@ -93,19 +94,22 @@ class MainIHNIL(object):
 
         combo = [[[(tok.string, tokenize.tok_name[tok.exact_type],
                  nst.index(val), self.ordr[dct].index(tok))
-                 for tok in self.ordr[dct]]
+                 for tok in self.ordr[dct]
+                 if tokenize.tok_name[tok.exact_type]
+                 not in ["INDENT", "NEWLINE"]
+                 if tok.string not in ["if", ":"]]
                  for val in nst for dct in self.ordr
                  if val == dct] for nst in self.nest]
-
-        # format    -> bltn_list & stng_list
-        # count     -> stng_list & lsts_list
-        # index     -> stng_list & lsts_list
 
         for grp in combo:
             for row in grp:
                 for itm in row:
-                    if itm[1] == "NAME" and itm[0] not in kwds_list:
-                        print(itm)
+                    if itm[1] == "NAME":
+                        print(itm[0])
+
+        # format    -> bltn_list & stng_list
+        # count     -> stng_list & lsts_list
+        # index     -> stng_list & lsts_list
 
     def _else_out(self):
         for nst in self.nest:

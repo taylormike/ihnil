@@ -62,5 +62,6 @@ Pull requests will only be accepted through [Github](https://github.com/)
 **John Forstmeier**, *primary author*, [@forstmeier](https://github.com/forstmeier)  
 
 Copyright (c) 2015-2016 John Forstmeier  
-
 Released under the [MIT License](https://github.com/forstmeier/pythonistics/blob/master/LICENSE.txt)  
+
+Logos designed on [logomakr.com](http://logomakr.com/)  
