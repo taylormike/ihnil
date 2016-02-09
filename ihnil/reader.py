@@ -96,10 +96,12 @@ class MainIHNIL(object):
                  for tok in self.ordr[dct]]
                  for val in nst for dct in self.ordr
                  if val == dct] for nst in self.nest]
+
         for grp in combo:
             for row in grp:
                 for itm in row:
-                    print(itm[0])
+                    if itm[1] == "NAME" and itm[0] not in kwds:
+                        print(itm)
 
     def _else_out(self):
         for nst in self.nest:
