@@ -41,7 +41,18 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
+class MainIHNIL(object):
+    def __init__(self, inpt):
+        self.inpt = inpt
+
+    def output(self):
+        module = ast.parse(self.inpt)
+
 if file_extension == ".py":
+    with open(args.file_name.name) as fn:
+        file_contents = fn.read()
+    instance = MainIHNIL(file_contents)
+
     if args.read:
         print("READ")
     elif args.write:
