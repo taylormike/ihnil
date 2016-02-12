@@ -17,10 +17,7 @@ Arguments:
 
 import argparse
 import os
-import tokenize
-import operator
-import itertools
-import keyword
+import ast
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
@@ -45,15 +42,11 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 if file_extension == ".py":
-    with open(args.file_name.name, "rb") as t_file:
-        tokens = list(tokenize.tokenize(t_file.readline))
-    instance = MainIHNIL(tokens)
-
     if args.read:
-        instance._read_out()
+        print("READ")
     elif args.write:
-        instance._write_out()
+        print("WRITE")
     else:
-        instance._else_out()
+        print("ELSE")
 else:
     print("\nPlease enter a Python file\n")
