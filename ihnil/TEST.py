@@ -23,11 +23,12 @@ def manyif(val):
 
 class Basic():
     """This is the Basic docstring"""
-    def __init__(self):
+    def __init__(self, val):
+        self.val = val
     
     # Here is another comment
-    def printr(self, val):
-        print("The input value is " + str(val))
+    def printr(self, self.val):
+        print("The input value is " + str(self.val))
 
 def listif(inp):
     if inp % 2 == 0:
