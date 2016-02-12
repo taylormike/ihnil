@@ -23,8 +23,8 @@ Currently only available for Python 3.
 
 This project has several phases listed below:  
 - [ ] Implement AST parsing structure
-- [ ] Identify nested loop statements
 - [ ] Implement class to hold all parsed code & functions
+- [ ] Identify nested if loop statements
 - [ ] Adjust argparse options to call needed class methods
 - [ ] Print out nested error line numbers
 - [ ] Print full error code lines
@@ -42,7 +42,7 @@ Other additions may be made to the list as the project develops.
 
 - [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)
 - [os](https://docs.python.org/3.4/library/os.html#module-os)
-- [tokenize](https://docs.python.org/3.4/library/tokenize.html#module-tokenize)
+- [ast](https://docs.python.org/3.4/library/ast.html)
 
 ## Contribution
 
