@@ -47,6 +47,7 @@ class MainIHNIL(object):
 
     def output(self):
         module = ast.parse(self.inpt)
+        print(ast.dump(module))
 
 if file_extension == ".py":
     with open(args.file_name.name) as fn:
@@ -55,9 +56,12 @@ if file_extension == ".py":
 
     if args.read:
         print("READ")
+        instance.output()
     elif args.write:
         print("WRITE")
+        instance.output()
     else:
         print("ELSE")
+        instance.output()
 else:
     print("\nPlease enter a Python file\n")
