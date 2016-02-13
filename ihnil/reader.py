@@ -47,11 +47,17 @@ class MainIHNIL(object):
 
     def output(self):
         module = ast.parse(self.inpt)
-        print(ast.dump(module))
+        for node in module.body:
+            if isinstance(node, ast.If):
+                print(node)
+            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                for itm in node.body:
+                    if isinstance(itm, ast.If):
+                        print(node)
 
 if file_extension == ".py":
-    with open(args.file_name.name) as fn:
-        file_contents = fn.read()
+    with open(args.file_name.name) as f:
+        file_contents = f.read()
     instance = MainIHNIL(file_contents)
 
     if args.read:
