@@ -18,6 +18,7 @@ Arguments:
 import argparse
 import os
 import ast
+import codegen
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
@@ -44,16 +45,28 @@ file_extension = os.path.splitext(string_name)[1]
 class MainIHNIL(object):
     def __init__(self, inpt):
         self.inpt = inpt
+        self.module = ast.parse(self.inpt)
 
-    def output(self):
-        module = ast.parse(self.inpt)
-        for node in module.body:
+    def print_out(self):
+        for node in self.module.body:
+            if isinstance(node, ast.If):
+                print(codegen.to_source(node))
+            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                for itm in node.body:
+                    if isinstance(itm, ast.If):
+                        print(codegen.to_source(itm))
+
+    def write_out(self):
+        for node in self.module.body:
             if isinstance(node, ast.If):
                 print(node)
             elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
                 for itm in node.body:
                     if isinstance(itm, ast.If):
-                        print(node)
+                        print(itm._fields)
+
+    def count_out(self):
+        pass
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
@@ -62,12 +75,12 @@ if file_extension == ".py":
 
     if args.read:
         print("READ")
-        instance.output()
+        instance.print_out()
     elif args.write:
         print("WRITE")
-        instance.output()
+        instance.write_out()
     else:
         print("ELSE")
-        instance.output()
+        instance.count_out()
 else:
     print("\nPlease enter a Python file\n")
