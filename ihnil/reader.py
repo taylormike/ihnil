@@ -54,7 +54,8 @@ class MainIHNIL(object):
             elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
                 for itm in node.body:
                     if isinstance(itm, ast.If):
-                        print(codegen.to_source(itm))
+                        print("Start line {}".format(itm.lineno))
+                        print(codegen.to_source(itm) + "\n")
 
     def write_out(self):
         for node in self.module.body:
@@ -66,7 +67,13 @@ class MainIHNIL(object):
                         print(itm._fields)
 
     def count_out(self):
-        pass
+        for node in self.module.body:
+            if isinstance(node, ast.If):
+                print("Nested error on line {}".format(node.lineno))
+            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                for itm in node.body:
+                    if isinstance(itm, ast.If):
+                        print("Nested error on line {}".format(itm.lineno))
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
