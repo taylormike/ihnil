@@ -12,7 +12,6 @@ Arguments:
     -h, --help      Show help message
     -r, --read      Displays the errors and location in the terminal
     -w, --write     Inserts recommended code changes into the script
-
 """
 
 import argparse
@@ -42,12 +41,24 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 class MainIHNIL(object):
-    pass
+    def __init__(self, inpt):
+        self.inpt = ast.parse(inpt)
+
+    if_list = []
+    def if_stmt_sort(self, nodes):
+        for node in nodes.body:
+            if "body" in node._fields:
+                if isinstance(node, ast.If):
+                    self.if_list.append(node)
+                else:
+                    self.if_stmt_sort(node)
+
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
         file_contents = f.read()
     instance = MainIHNIL(file_contents)
+    instance.if_stmt_sort(instance.inpt)
 
     if args.read:
         print("READ")
@@ -55,5 +66,6 @@ if file_extension == ".py":
         print("WRITE")
     else:
         print("ELSE")
+        print(instance.if_list)
 else:
     print("\nPlease enter a Python file\n")
