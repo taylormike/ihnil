@@ -47,33 +47,43 @@ class MainIHNIL(object):
         self.inpt = inpt
         self.module = ast.parse(self.inpt)
 
-    def print_out(self):
-        for node in self.module.body:
-            if isinstance(node, ast.If):
-                print(codegen.to_source(node))
-            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                for itm in node.body:
-                    if isinstance(itm, ast.If):
-                        print("Start line {}".format(itm.lineno))
-                        print(codegen.to_source(itm) + "\n")
+    def selector(self, num):
+        self.num = num
 
-    def write_out(self):
-        for node in self.module.body:
-            if isinstance(node, ast.If):
-                print(node)
-            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                for itm in node.body:
-                    if isinstance(itm, ast.If):
-                        print(itm._fields)
+    def _first1(self):
+        print(codegen.to_source(node))
 
-    def count_out(self):
+    def _first2(self):
+        print(node._fields)
+
+    def _first3(self):
+        print("Nested error on line {}".format(node.lineno))
+
+    def _second1(self):
+        for itm in node.body:
+            if isinstance(itm, ast.If):
+                print("Start line {}".format(itm.lineno))
+                print(codegen.to_source(itm) + "\n")
+
+    def _second2(self):
+        for itm in node.body:
+            if isinstance(itm, ast.If):
+                print(itm._fields)
+
+    def _second3(self):
+        for itm in node.body:
+            if isinstance(itm, ast.If):
+                print("Nested error on line {}".format(itm.lineno))
+
+    FIRST = {1: _first1, 2: _first2, 3: _first3}
+    SECOND = {1: _second1, 2: _second2, 3: _second3}
+
+    def result_out(self):
         for node in self.module.body:
             if isinstance(node, ast.If):
-                print("Nested error on line {}".format(node.lineno))
+                self.FIRST[self.num](self)
             elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                for itm in node.body:
-                    if isinstance(itm, ast.If):
-                        print("Nested error on line {}".format(itm.lineno))
+                self.SECOND[self.num](self)
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
@@ -82,12 +92,15 @@ if file_extension == ".py":
 
     if args.read:
         print("READ")
-        instance.print_out()
+        instance.selector(1)
+        instance.result_out()
     elif args.write:
         print("WRITE")
-        instance.write_out()
+        instance.selector(2)
+        instance.result_out()
     else:
         print("ELSE")
-        instance.count_out()
+        instance.selector(3)
+        instance.result_out()
 else:
     print("\nPlease enter a Python file\n")
