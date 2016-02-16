@@ -17,6 +17,7 @@ Arguments:
 import argparse
 import os
 import ast
+import codegen
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
@@ -53,6 +54,18 @@ class MainIHNIL(object):
                 else:
                     self.if_stmt_sort(node)
 
+    def _read_out(self):
+        for itm in instance.if_list:
+            print(codegen.to_source(itm) + "\n")
+
+    def _write_out(self):
+        for itm in instance.if_list:
+            print("WRITE NODE EXAMPLE")
+
+    def _else_out(self):
+        for itm in instance.if_list:
+            print("Nested 'if': line #{}".format(itm.lineno))
+
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
@@ -62,10 +75,12 @@ if file_extension == ".py":
 
     if args.read:
         print("READ")
+        instance._read_out()
     elif args.write:
         print("WRITE")
+        instance._write_out()
     else:
         print("ELSE")
-        print(instance.if_list)
+        instance._else_out()
 else:
     print("\nPlease enter a Python file\n")

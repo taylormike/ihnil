@@ -4,6 +4,9 @@ def multipy(x, y):
     """This is the multipy docstring"""
     print(x * y)
 
+if True:
+    print("Only a flesh wound")
+
 def evenpy(num):
     # This is a test comment string
     if num == 0:
