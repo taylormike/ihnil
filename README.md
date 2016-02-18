@@ -22,19 +22,16 @@ Currently only available for Python 3.
 ## Development
 
 This project has several phases listed below:  
-- [X] Identify nested loop statements
-- [X] Print results errors to the terminal
-- [X] Add printout for error location values
-- [X] Implement class to hold all parsed code & functions
-- [X] Adjust argparse options to call needed class methods
+- [X] Implement AST parsing structure
+- [ ] Implement class to hold all parsed code & functions
+- [ ] Identify nested if loop statements
+- [ ] Adjust argparse options to call needed class methods
+- [ ] Print out nested error line numbers
+- [ ] Print full error code lines
 - [ ] Parse "if" statements to identify improvements
-- [ ] Improve nested "if" identifier accuracy
-- [ ] Function to remove comment lines (to ID nested "if"s)
 - [ ] Print improvements to the terminal
-- [ ] Insert recommendations into the code
-- [ ] Include string method identification support
-- [ ] Include list method identification support
-- [ ] Build auto editor for recommendations
+- [ ] Insert recommendations into the module
+- [ ] Build auto editor for recommendations (e.g. "Approve change? y/n")
 - [ ] Develop PyPI distribution
 - [ ] Identify unecessary stacked "if" statements (**long term**)
 - [ ] Identify list comprehension options (**longER term**)
@@ -45,9 +42,7 @@ Other additions may be made to the list as the project develops.
 
 - [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)
 - [os](https://docs.python.org/3.4/library/os.html#module-os)
-- [tokenize](https://docs.python.org/3.4/library/tokenize.html#module-tokenize)
-- [operator](https://docs.python.org/3.4/library/operator.html#module-operator)
-- [itertools](https://docs.python.org/3.4/library/itertools.html#module-itertools)
+- [ast](https://docs.python.org/3.4/library/ast.html)
 
 ## Contribution
 
