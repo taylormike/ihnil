@@ -22,7 +22,7 @@ Currently only available for Python 3.
 ## Development
 
 This project has several phases listed below:  
-- [ ] Implement AST parsing structure
+- [X] Implement AST parsing structure
 - [ ] Implement class to hold all parsed code & functions
 - [ ] Identify nested if loop statements
 - [ ] Adjust argparse options to call needed class methods

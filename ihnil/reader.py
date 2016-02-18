@@ -41,46 +41,31 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-class MainIHNIL(object):
-    def __init__(self, inpt):
-        self.inpt = ast.parse(inpt)
+class ReadIHNIL(ast.NodeVisitor):
+    def visit_If(self, node):
+        print("Print node {} {}".format(node.lineno, node))
 
-    if_list = []
-    def if_stmt_sort(self, nodes):
-        for node in nodes.body:
-            if "body" in node._fields:
-                if isinstance(node, ast.If):
-                    self.if_list.append(node)
-                else:
-                    self.if_stmt_sort(node)
 
-    def _read_out(self):
-        for itm in instance.if_list:
-            print(codegen.to_source(itm) + "\n")
+class WriteIHNIL(ast.NodeVisitor):
+    def visit_If(self, node):
+        print("Write node {} {}".format(node.lineno, node))
 
-    def _write_out(self):
-        for itm in instance.if_list:
-            print("WRITE NODE EXAMPLE")
 
-    def _else_out(self):
-        for itm in instance.if_list:
-            print("Nested 'if': line #{}".format(itm.lineno))
+class ElseIHNIL(ast.NodeVisitor):
+    def visit_If(self, node):
+        print("Else node {} {}".format(node.lineno, node))
 
 
 if file_extension == ".py":
     with open(args.file_name.name) as f:
         file_contents = f.read()
-    instance = MainIHNIL(file_contents)
-    instance.if_stmt_sort(instance.inpt)
+    module = ast.parse(file_contents)
 
     if args.read:
-        print("READ")
-        instance._read_out()
+        ReadIHNIL().visit(module)
     elif args.write:
-        print("WRITE")
-        instance._write_out()
+        WriteIHNIL().visit(module)
     else:
-        print("ELSE")
-        instance._else_out()
+        ElseIHNIL().visit(module)
 else:
     print("\nPlease enter a Python file\n")
