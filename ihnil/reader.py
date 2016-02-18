@@ -48,7 +48,9 @@ class ReadIHNIL(ast.NodeVisitor):
 
 class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
-        print("Write node {} {}".format(node.lineno, node))
+        print("Print node Start {} {}".format(node.lineno, node))
+        ast.NodeVisitor.generic_visit(self, node)
+        print("Print node End {} {}".format(node.lineno, node))
 
 
 class ElseIHNIL(ast.NodeVisitor):
