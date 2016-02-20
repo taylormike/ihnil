@@ -42,18 +42,27 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 class ReadIHNIL(ast.NodeVisitor):
+    count = 1
+
     def visit_If(self, node):
-        print("Print node {} {}".format(node.lineno, node))
+        print("### If error number {} ###".format(self.count))
+        print(codegen.to_source(node) + "\n")
+        self.count += 1
 
 
 class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         print("Write node {} {}".format(node.lineno, node))
+        self.generic_visit(node)
 
 
 class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
-        print("Else node {} {}".format(node.lineno, node))
+        if isinstance(node.body[0], ast.If):
+            start = node.lineno
+            print(start)
+
+
 
 
 if file_extension == ".py":
