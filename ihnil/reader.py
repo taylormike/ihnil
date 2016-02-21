@@ -57,18 +57,22 @@ class WriteIHNIL(ast.NodeVisitor):
 
 
 class ElseIHNIL(ast.NodeVisitor):
+    count = 0
+
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            print("Nested 'if' node start line {}".format(node.lineno))
-            self.endline(node)
+            self.count += 1
+            print("Nested 'if' node {} start line {}".format(self.count,
+                                                             node.lineno))
+            self.endline(node, self.count)
 
-    def endline(self, node):
+    def endline(self, node, count):
         if isinstance(node, ast.If):
             self.endno = node.lineno
             node = node.body[0]
-            self.endline(node)
+            self.endline(node, count)
         else:
-            print("Nested 'if' node end line {}".format(self.endno))
+            print("Nested 'if' node {} end line {}".format(count, self.endno))
             
 
 
