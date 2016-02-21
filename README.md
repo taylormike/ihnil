@@ -19,25 +19,6 @@ python3 reader.py [ -r/--read | -w/--read ] [ -h/--help ] filename
 The default optional argument is ` -r / --read `.  
 Currently only available for Python 3.  
 
-## Development
-
-This project has several phases listed below:  
-- [X] Implement AST parsing structure
-- [ ] Implement class to hold all parsed code & functions
-- [ ] Identify nested if loop statements
-- [ ] Adjust argparse options to call needed class methods
-- [ ] Print out nested error line numbers
-- [ ] Print full error code lines
-- [ ] Parse "if" statements to identify improvements
-- [ ] Print improvements to the terminal
-- [ ] Insert recommendations into the module
-- [ ] Build auto editor for recommendations (e.g. "Approve change? y/n")
-- [ ] Develop PyPI distribution
-- [ ] Identify unecessary stacked "if" statements (**long term**)
-- [ ] Identify list comprehension options (**longER term**)
-
-Other additions may be made to the list as the project develops.  
-
 ## Dependencies
 
 - [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)

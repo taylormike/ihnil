@@ -46,7 +46,7 @@ class ReadIHNIL(ast.NodeVisitor):
 
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            print("### If error number {} ###".format(self.count))
+            print("## Nested 'if' error number {} ##".format(self.count))
             print(codegen.to_source(node) + "\n")
             self.count += 1
 
@@ -58,14 +58,14 @@ class WriteIHNIL(ast.NodeVisitor):
 
 
 class ElseIHNIL(ast.NodeVisitor):
-    count = 0
+    count = 1
 
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            self.count += 1
-            print("Nested 'if' node {} start line {}".format(self.count,
-                                                             node.lineno))
+            print("## Nested 'if' number {} start line {}".format(self.count,
+                                                                  node.lineno))
             self.endline(node, self.count)
+            self.count += 1
 
     def endline(self, node, count):
         if isinstance(node, ast.If):
@@ -73,7 +73,8 @@ class ElseIHNIL(ast.NodeVisitor):
             node = node.body[0]
             self.endline(node, count)
         else:
-            print("Nested 'if' node {} end line {}".format(count, self.endno))
+            print("## Nested 'if' number {} end line {}".format(count,
+                                                                self.endno))
 
 
 if file_extension == ".py":
