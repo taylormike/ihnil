@@ -59,10 +59,24 @@ class WriteIHNIL(ast.NodeVisitor):
 class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            start = node.lineno
-            print(start)
+            print("Nested 'if' node start line {}".format(node.lineno))
+            self.endline(node)
+
+    def endline(self, node):
+        if isinstance(node, ast.If):
+            self.endno = node.lineno
+            node = node.body[0]
+            self.endline(node)
+        else:
+            print("Nested 'if' node end line {}".format(self.endno))
+            
 
 
+#        start = node.lineno
+#        if isinstance(node.body[0], ast.If):
+#            end = node.body[0].lineno
+#            print(start, end)
+#            self.generic_visit(node)
 
 
 if file_extension == ".py":
