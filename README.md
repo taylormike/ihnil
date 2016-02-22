@@ -24,6 +24,7 @@ Currently only available for Python 3.
 - [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)
 - [os](https://docs.python.org/3.4/library/os.html#module-os)
 - [ast](https://docs.python.org/3.4/library/ast.html)
+- [codegen](https://github.com/andreif/codegen)
 
 ## Contribution
 
