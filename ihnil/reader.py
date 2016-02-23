@@ -53,8 +53,21 @@ class ReadIHNIL(ast.NodeVisitor):
 
 class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
-        print("Write node {} {}".format(node.lineno, node))
-        self.generic_visit(node)
+        if isinstance(node.body[0], ast.If):
+            if isinstance(node.test, ast.Compare):
+                print("Write node {} {}".format(node.lineno, node))
+                self.generic_visit(node)
+
+# TODO:
+# for i in module.body:
+#     if isinstance(i, ast.FunctionDef):
+#         if isinstance(i.body[0], ast.If):
+#             for j in ast.iter_fields(i.body[0].test):
+#                 print(j)
+
+    def last_node(self, node):
+        if isinstance(node, ast.If):
+            pass
 
 
 class ElseIHNIL(ast.NodeVisitor):
@@ -70,8 +83,7 @@ class ElseIHNIL(ast.NodeVisitor):
     def endline(self, node, count):
         if isinstance(node, ast.If):
             self.endno = node.lineno
-            node = node.body[0]
-            self.endline(node, count)
+            self.endline(node.body[0], count)
         else:
             print("[> Nested 'if' number {} end line {}".format(count,
                                                                 self.endno))
