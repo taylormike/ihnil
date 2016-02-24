@@ -1,5 +1,5 @@
 """
-Python script parsing module.
+IHNIL
 
 Description:
 
@@ -52,22 +52,19 @@ class ReadIHNIL(ast.NodeVisitor):
 
 
 class WriteIHNIL(ast.NodeVisitor):
+    collection = []
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            if isinstance(node.test, ast.Compare):
-                print("Write node {} {}".format(node.lineno, node))
-                self.generic_visit(node)
+            self.next_line(node)
+            print("These are the variables {}".format(set(self.collection)))
 
-# TODO:
-# for i in module.body:
-#     if isinstance(i, ast.FunctionDef):
-#         if isinstance(i.body[0], ast.If):
-#             for j in ast.iter_fields(i.body[0].test):
-#                 print(j)
-
-    def last_node(self, node):
-        if isinstance(node, ast.If):
-            pass
+    def next_line(self, node):
+        if "test" in node._fields and isinstance(node.test, ast.Compare):
+            print(ast.dump(node.test.left))
+            print(node.test.left._fields)
+            if "id" in node.test.left._fields:
+                self.collection.append(node.test.left.id)
+            self.next_line(node.body[0])
 
 
 class ElseIHNIL(ast.NodeVisitor):
