@@ -1,17 +1,8 @@
 """
-IHNIL
+IHNIL main parsing module.
 
-Description:
+Provides the interface for evaluating a given target file
 
-    Prounounced "eye-nil"; this tool allows the user to identify and improve
-    upon nested "if" loop statements.
-
-Arguments:
-
-    file_name       The target file to parse
-    -h, --help      Show help message
-    -r, --read      Displays the errors and location in the terminal
-    -w, --write     Inserts recommended code changes into the script
 """
 
 import argparse
@@ -42,6 +33,8 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 class ReadIHNIL(ast.NodeVisitor):
+    """This class provides simple error node code print out."""
+
     count = 1
 
     def visit_If(self, node):
@@ -52,6 +45,8 @@ class ReadIHNIL(ast.NodeVisitor):
 
 
 class WriteIHNIL(ast.NodeVisitor):
+    """This class allows for comprehensive code optimization."""
+
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
             global node_vars
@@ -74,6 +69,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
 
 class ElseIHNIL(ast.NodeVisitor):
+    """This class is the default error node line number identifier."""
+
     count = 1
 
     def visit_If(self, node):
