@@ -54,18 +54,23 @@ class ReadIHNIL(ast.NodeVisitor):
 class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
+            global node_vars
+            global node_oprs
+            node_vars = set()
+            node_oprs = set()
             print(self.next_line(node))
 
     def next_line(self, node):
         if "test" in node._fields and isinstance(node.test, ast.Compare):
-            global collection
-            collection = []
-            # ast.dump(node.test.left)
-            # node.test.left._fields
-            if "id" in node.test.left._fields:
-                collection.append(node.test.left.id)
+            if isinstance(node.test.left, ast.Name):
+                node_vars.add(node.test.left.id)
+                node_oprs.add(ast.dump(node.test.ops[0]))
+#            print("1 {}".format(ast.dump(node.test)))
+#            print("2 {}".format(ast.dump(node.test.left)))
+#            print("3 {}".format(node._fields))
+#            print("4 {}".format(node.orelse))
             self.next_line(node.body[0])
-        return collection
+        return (node_vars, node_oprs)
 
 
 class ElseIHNIL(ast.NodeVisitor):
