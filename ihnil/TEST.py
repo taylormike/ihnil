@@ -4,13 +4,16 @@ def multipy(x, y):
     """This is the multipy docstring"""
     print(x * y)
 
+if True:
+    print("Only a flesh wound")
+
 def evenpy(num):
     # This is a test comment string
     if num == 0:
         print("Input is zero")
-    if num == 1:
+    elif num == 1:
         print("Input is odd")
-    if num % 2 == 0:
+    elif num % 2 == 0:
         print("Input is even")
     else:
         print("Input is odd")
