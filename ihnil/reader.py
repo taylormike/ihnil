@@ -53,19 +53,53 @@ class WriteIHNIL(ast.NodeVisitor):
             global node_oprs
             node_vars = set()
             node_oprs = set()
+
             print(self.next_line(node))
+            decider = input("Would you like to:\n"
+                            "Accept change  ->  'a'\n"
+                            "Edit manually  ->  'e'\n"
+                            "Mark complete  ->  'c'\n"
+                            "Provide your choice and hit 'enter' ")
+
+            if decider == "a":
+                self.accept_change()
+            elif decider == "e":
+                self.edit_manually()
+            elif decider == "c":
+                self.mark_complete()
+            else:
+                pass
 
     def next_line(self, node):
         if "test" in node._fields and isinstance(node.test, ast.Compare):
             if isinstance(node.test.left, ast.Name):
                 node_vars.add(node.test.left.id)
                 node_oprs.add(ast.dump(node.test.ops[0]))
-#            print("1 {}".format(ast.dump(node.test)))
+            print("1 {}".format(ast.dump(node.test)))
 #            print("2 {}".format(ast.dump(node.test.left)))
 #            print("3 {}".format(node._fields))
 #            print("4 {}".format(node.orelse))
+
+            # TODO: build functionality to loop to the core if test
+            # TODO: create necessary bins to hold all relevant information
+            # TODO: algorithm to optimize structure for if test
+            # TODO: store optimized loops in separate variables
             self.next_line(node.body[0])
         return (node_vars, node_oprs)
+
+    def accept_change(self):
+        # TODO: identify and remove error loops from module
+        # TODO: take associated optimized loop and print into module
+        pass
+
+    def edit_manually(self):
+        # TODO: mark off error loops in module
+        pass
+
+    def mark_complete(self):
+        # TODO: take down error code line information
+        # TODO: print into a separate file that holds data
+        pass
 
 
 class ElseIHNIL(ast.NodeVisitor):
