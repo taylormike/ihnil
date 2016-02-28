@@ -49,10 +49,14 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            global node_vars
-            global node_oprs
-            node_vars = set()
-            node_oprs = set()
+            global node_variables
+            global node_operators
+            global node_compare
+            global fixed_node
+            node_variables = set()
+            node_operators = set()
+            node_compare = set()
+            fixed_node = "if "
 
             print(self.next_line(node))
             decider = input("Would you like to:\n"
@@ -61,6 +65,11 @@ class WriteIHNIL(ast.NodeVisitor):
                             "Mark complete  ->  'c'\n"
                             "Provide your choice and hit 'enter' ")
 
+            # TODO: reconstructing/optimizing algorithm here
+
+
+
+
             if decider == "a":
                 self.accept_change()
             elif decider == "e":
@@ -68,14 +77,19 @@ class WriteIHNIL(ast.NodeVisitor):
             elif decider == "c":
                 self.mark_complete()
             else:
-                pass
+                print("Skipped")
 
     def next_line(self, node):
         if "test" in node._fields and isinstance(node.test, ast.Compare):
             if isinstance(node.test.left, ast.Name):
-                node_vars.add(node.test.left.id)
-                node_oprs.add(ast.dump(node.test.ops[0]))
-            print("1 {}".format(ast.dump(node.test)))
+                node_variables.add(node.test.left.id)
+                node_operators.add(ast.dump(node.test.ops[0]))
+#                node_compare.add(node.test.comparators[0])
+
+            
+
+
+            print("[> {}".format(ast.dump(node.test)))
 #            print("2 {}".format(ast.dump(node.test.left)))
 #            print("3 {}".format(node._fields))
 #            print("4 {}".format(node.orelse))
@@ -85,7 +99,7 @@ class WriteIHNIL(ast.NodeVisitor):
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
             self.next_line(node.body[0])
-        return (node_vars, node_oprs)
+        return (node_variables, node_operators)
 
     def accept_change(self):
         # TODO: identify and remove error loops from module
