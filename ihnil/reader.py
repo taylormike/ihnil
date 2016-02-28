@@ -49,68 +49,71 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def visit_If(self, node):
         if isinstance(node.body[0], ast.If):
-            global node_variables
-            global node_operators
-            global node_compare
-            global fixed_node
-            node_variables = set()
-            node_operators = set()
-            node_compare = set()
-            fixed_node = "if "
 
-            print(self.next_line(node))
+            self.next_line(node)
+
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
                             "Edit manually  ->  'e'\n"
                             "Mark complete  ->  'c'\n"
                             "Provide your choice and hit 'enter' ")
 
-            # TODO: reconstructing/optimizing algorithm here
-
-
-
-
             if decider == "a":
-                self.accept_change()
+                self._accept_change()
             elif decider == "e":
-                self.edit_manually()
+                self._edit_manually()
             elif decider == "c":
-                self.mark_complete()
+                self._mark_complete()
             else:
                 print("Skipped")
 
     def next_line(self, node):
         if "test" in node._fields and isinstance(node.test, ast.Compare):
-            if isinstance(node.test.left, ast.Name):
-                node_variables.add(node.test.left.id)
-                node_operators.add(ast.dump(node.test.ops[0]))
-#                node_compare.add(node.test.comparators[0])
+            if isinstance(node.test.left, ast.BinOp):
+                left = ast.dump(node.test.left.left)
+                op = ast.dump(node.test.left.op)
+                right = ast.dump(node.test.left.right)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("1. BINOP {} {} {} {} {}".format(left, op, right,
+                                                       ops, comp))
+            elif isinstance(node.test.left, ast.Name):
+                left = ast.dump(node.test.left)
 
-            
+                if "id" in left:
+                    print("IDENTIFIER")
+                elif "Str" in left:
+                    print("STRING")
+                elif "Num" in left:
+                    print("NUMBER")
 
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("2. NAME {} {} {}".format(left, ops, comp))
 
-            print("[> {}".format(ast.dump(node.test)))
-#            print("2 {}".format(ast.dump(node.test.left)))
-#            print("3 {}".format(node._fields))
-#            print("4 {}".format(node.orelse))
+            print("3. {}".format(ast.dump(node.test)))
+#            items: id, Str (s), Num (n), List, Tuple, Set, Dict
 
             # TODO: build functionality to loop to the core if test
             # TODO: create necessary bins to hold all relevant information
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
-            self.next_line(node.body[0])
-        return (node_variables, node_operators)
 
-    def accept_change(self):
+            self.next_line(node.body[0])
+
+    def _accept_change(self):
+        """Private method to automatically apply optimized code."""
         # TODO: identify and remove error loops from module
         # TODO: take associated optimized loop and print into module
         pass
 
-    def edit_manually(self):
+    def _edit_manually(self):
+        """Private method to allow for manual code adjustments."""
         # TODO: mark off error loops in module
         pass
 
-    def mark_complete(self):
+    def _mark_complete(self):
+        """Private method to mark and ignore non-optimized code."""
         # TODO: take down error code line information
         # TODO: print into a separate file that holds data
         pass
@@ -125,13 +128,14 @@ class ElseIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' number {} start line {}".format(self.count,
                                                                   node.lineno))
-            self.endline(node, self.count)
+            self._end_line(node, self.count)
             self.count += 1
 
-    def endline(self, node, count):
+    def _end_line(self, node, count):
+        """Private recursive method to loop down to the last node line."""
         if isinstance(node, ast.If):
             self.endno = node.lineno
-            self.endline(node.body[0], count)
+            self._end_line(node.body[0], count)
         else:
             print("[> Nested 'if' number {} end line {}".format(count,
                                                                 self.endno))
