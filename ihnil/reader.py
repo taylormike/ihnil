@@ -56,7 +56,7 @@ class WriteIHNIL(ast.NodeVisitor):
                             "Accept change  ->  'a'\n"
                             "Edit manually  ->  'e'\n"
                             "Mark complete  ->  'c'\n"
-                            "Provide your choice and hit 'enter' ")
+                            "Provide your choice and hit 'enter': ")
 
             if decider == "a":
                 self._accept_change()
@@ -68,34 +68,53 @@ class WriteIHNIL(ast.NodeVisitor):
                 print("Skipped")
 
     def next_line(self, node):
+        """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
-            if isinstance(node.test.left, ast.BinOp):
+            if isinstance(node.test.left, ast.Name):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("1. NAME: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Str):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("2. STR: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Num):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("3. NUM: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.List):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("4. LIST: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Tuple):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("5. TUPLE: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Set):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("6. SET: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Dict):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("6. DICT: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.BinOp):
                 left = ast.dump(node.test.left.left)
                 op = ast.dump(node.test.left.op)
                 right = ast.dump(node.test.left.right)
                 ops = ast.dump(node.test.ops[0])
                 comp = ast.dump(node.test.comparators[0])
-                print("1. BINOP {} {} {} {} {}".format(left, op, right,
-                                                       ops, comp))
-            elif isinstance(node.test.left, ast.Name):
-                left = ast.dump(node.test.left)
+                print("7. BINOP: {} {} {} {} {}".format(left, op, right,
+                                                        ops, comp))
+#            print("8. {}".format(ast.dump(node.test)))
 
-                if "id" in left:
-                    print("IDENTIFIER")
-                elif "Str" in left:
-                    print("STRING")
-                elif "Num" in left:
-                    print("NUMBER")
-
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("2. NAME {} {} {}".format(left, ops, comp))
-
-            print("3. {}".format(ast.dump(node.test)))
-#            items: id, Str (s), Num (n), List, Tuple, Set, Dict
-
-            # TODO: build functionality to loop to the core if test
-            # TODO: create necessary bins to hold all relevant information
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
 
