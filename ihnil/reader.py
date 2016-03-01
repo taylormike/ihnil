@@ -1,17 +1,8 @@
 """
-Python script parsing module.
+IHNIL main parsing module.
 
-Description:
+Provides the interface for evaluating a given target file
 
-    Prounounced "eye-nil"; this tool allows the user to identify and improve
-    upon nested "if" loop statements.
-
-Arguments:
-
-    file_name       The target file to parse
-    -h, --help      Show help message
-    -r, --read      Displays the errors and location in the terminal
-    -w, --write     Inserts recommended code changes into the script
 """
 
 import argparse
@@ -42,18 +33,131 @@ file_extension = os.path.splitext(string_name)[1]
 
 
 class ReadIHNIL(ast.NodeVisitor):
+    """This class provides simple error node code print out."""
+
+    count = 1
+
     def visit_If(self, node):
-        print("Print node {} {}".format(node.lineno, node))
+        if isinstance(node.body[0], ast.If):
+            print("[> Nested 'if' error number {} <]".format(self.count))
+            print(codegen.to_source(node) + "\n")
+            self.count += 1
 
 
 class WriteIHNIL(ast.NodeVisitor):
+    """This class allows for comprehensive code optimization."""
+
     def visit_If(self, node):
-        print("Write node {} {}".format(node.lineno, node))
+        if isinstance(node.body[0], ast.If):
+
+            self.next_line(node)
+
+            decider = input("Would you like to:\n"
+                            "Accept change  ->  'a'\n"
+                            "Edit manually  ->  'e'\n"
+                            "Mark complete  ->  'c'\n"
+                            "Provide your choice and hit 'enter': ")
+
+            if decider == "a":
+                self._accept_change()
+            elif decider == "e":
+                self._edit_manually()
+            elif decider == "c":
+                self._mark_complete()
+            else:
+                print("Skipped")
+
+    def next_line(self, node):
+        """Parse nodes and provide optimized code."""
+        if "test" in node._fields and isinstance(node.test, ast.Compare):
+            if isinstance(node.test.left, ast.Name):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("1. NAME: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Str):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("2. STR: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Num):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("3. NUM: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.List):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("4. LIST: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Tuple):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("5. TUPLE: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Set):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("6. SET: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.Dict):
+                left = ast.dump(node.test.left)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("6. DICT: {} {} {}".format(left, ops, comp))
+            elif isinstance(node.test.left, ast.BinOp):
+                left = ast.dump(node.test.left.left)
+                op = ast.dump(node.test.left.op)
+                right = ast.dump(node.test.left.right)
+                ops = ast.dump(node.test.ops[0])
+                comp = ast.dump(node.test.comparators[0])
+                print("7. BINOP: {} {} {} {} {}".format(left, op, right,
+                                                        ops, comp))
+#            print("8. {}".format(ast.dump(node.test)))
+
+            # TODO: algorithm to optimize structure for if test
+            # TODO: store optimized loops in separate variables
+
+            self.next_line(node.body[0])
+
+    def _accept_change(self):
+        """Private method to automatically apply optimized code."""
+        # TODO: identify and remove error loops from module
+        # TODO: take associated optimized loop and print into module
+        pass
+
+    def _edit_manually(self):
+        """Private method to allow for manual code adjustments."""
+        # TODO: mark off error loops in module
+        pass
+
+    def _mark_complete(self):
+        """Private method to mark and ignore non-optimized code."""
+        # TODO: take down error code line information
+        # TODO: print into a separate file that holds data
+        pass
 
 
 class ElseIHNIL(ast.NodeVisitor):
+    """This class is the default error node line number identifier."""
+
+    count = 1
+
     def visit_If(self, node):
-        print("Else node {} {}".format(node.lineno, node))
+        if isinstance(node.body[0], ast.If):
+            print("[> Nested 'if' number {} start line {}".format(self.count,
+                                                                  node.lineno))
+            self._end_line(node, self.count)
+            self.count += 1
+
+    def _end_line(self, node, count):
+        """Private recursive method to loop down to the last node line."""
+        if isinstance(node, ast.If):
+            self.endno = node.lineno
+            self._end_line(node.body[0], count)
+        else:
+            print("[> Nested 'if' number {} end line {}".format(count,
+                                                                self.endno))
 
 
 if file_extension == ".py":

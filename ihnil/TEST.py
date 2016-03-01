@@ -35,5 +35,7 @@ class Basic():
 
 def listif(inp):
     if inp % 2 == 0:
-        if inp in [1, 2, 3, 4, 5]:
-            print(inp)
+        if 6 > inp:
+            if inp != "SPAMELOT":
+                if inp in [1, 2, 3, 4, 5]:
+                    print(inp)
