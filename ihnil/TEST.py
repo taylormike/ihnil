@@ -33,9 +33,10 @@ class Basic():
     def printr(self):
         print("The input value is " + str(self.val))
 
-def listif(inp):
+def listif(inp, num):
     if inp % 2 == 0:
         if 6 > inp:
             if inp != "SPAMELOT":
                 if inp in [1, 2, 3, 4, 5]:
-                    print(inp)
+                    if inp == (num % 2):
+                        print(inp)

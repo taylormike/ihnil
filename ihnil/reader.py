@@ -70,50 +70,36 @@ class WriteIHNIL(ast.NodeVisitor):
     def next_line(self, node):
         """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
-            if isinstance(node.test.left, ast.Name):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("1. NAME: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.Str):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("2. STR: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.Num):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("3. NUM: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.List):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("4. LIST: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.Tuple):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("5. TUPLE: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.Set):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("6. SET: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.Dict):
-                left = ast.dump(node.test.left)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("6. DICT: {} {} {}".format(left, ops, comp))
-            elif isinstance(node.test.left, ast.BinOp):
-                left = ast.dump(node.test.left.left)
-                op = ast.dump(node.test.left.op)
-                right = ast.dump(node.test.left.right)
-                ops = ast.dump(node.test.ops[0])
-                comp = ast.dump(node.test.comparators[0])
-                print("7. BINOP: {} {} {} {} {}".format(left, op, right,
-                                                        ops, comp))
-#            print("8. {}".format(ast.dump(node.test)))
+
+            # left, ops, comparators
+
+            def _evaluator(inpt, choice):
+                outr = inpt.test
+                if choice == "left":
+                    inp = inpt.test.left
+                elif choice == "comp":
+                    inp = inpt.test.comparators[0]
+
+                if isinstance(inp, ast.Name):
+                    print("NAME {}".format(inp.id))
+                if isinstance(inp, ast.Num):
+                    print("NUMBER {}".format(inp.n))
+                if isinstance(inp, ast.Str):
+                    print("STRING {}".format(inp.s))
+                if isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
+                    print("CONTAINER {}".format(ast.dump(outr)))
+                if isinstance(inp, ast.BinOp):
+                    left = inp.left
+                    op = inp.op
+                    right = inp.right
+                    ops = outr.ops[0]
+                    comp = outr.comparators[0]
+                    print("BINOP {}".format(ast.dump(outr)))
+
+
+
+            _evaluator(node, "left")
+#            _evaluator(node, "comp")
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
