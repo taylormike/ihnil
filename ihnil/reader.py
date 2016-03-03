@@ -71,42 +71,28 @@ class WriteIHNIL(ast.NodeVisitor):
         """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
 
-            # left, ops, comparators
-
             def _evaluator(inpt, choice):
                 if choice == "left":
                     inp = inpt.test.left
                 elif choice == "comp":
                     inp = inpt.test.comparators[0]
-                elif choice == "bin_left":
+                elif choice == "nest_left":
                     inp = inpt.left
-                elif choice == "bin_comp":
-                    inp = inpt.comparators[0]
+                elif choice == "nest_right":
+                    inp = inpt.right
 
                 if isinstance(inp, ast.Name):
                     print("NAME {}".format(inp.id))
-                if isinstance(inp, ast.Num):
+                elif isinstance(inp, ast.Num):
                     print("NUMBER {}".format(inp.n))
-                if isinstance(inp, ast.Str):
+                elif isinstance(inp, ast.Str):
                     print("STRING {}".format(inp.s))
-                if isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
+                elif isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
                     print("CONTAINER {}".format(ast.dump(inp)))
-                if isinstance(inp, ast.Compare):
-                    _evaluator(inp, "bin_left")
-                if isinstance(inp, ast.BinOp):
-                    _evaluator(inp, "bin_left")
-
-#                if isinstance(inp, ast.BinOp):
-#                    left = inp.left
-#                    op = inp.op
-#                    right = inp.right
-#                    ops = outr.ops[0]
-#                    comp = outr.comparators[0]
-#                    print("BINOP {}".format(ast.dump(outr)))
-#                    _evaluator(left, "left")
-#                    _evaluator(comp, "comp")
-
-
+                elif isinstance(inp, ast.BinOp):
+                    _evaluator(inp, "nest_left")
+                    print("OP {}".format(ast.dump(inp.op)))
+                    _evaluator(inp, "nest_right")
 
             _evaluator(node, "left")
 #            _evaluator(node, "comp")
