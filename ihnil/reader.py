@@ -74,11 +74,14 @@ class WriteIHNIL(ast.NodeVisitor):
             # left, ops, comparators
 
             def _evaluator(inpt, choice):
-                outr = inpt.test
                 if choice == "left":
                     inp = inpt.test.left
                 elif choice == "comp":
                     inp = inpt.test.comparators[0]
+                elif choice == "bin_left":
+                    inp = inpt.left
+                elif choice == "bin_comp":
+                    inp = inpt.comparators[0]
 
                 if isinstance(inp, ast.Name):
                     print("NAME {}".format(inp.id))
@@ -87,14 +90,21 @@ class WriteIHNIL(ast.NodeVisitor):
                 if isinstance(inp, ast.Str):
                     print("STRING {}".format(inp.s))
                 if isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
-                    print("CONTAINER {}".format(ast.dump(outr)))
+                    print("CONTAINER {}".format(ast.dump(inp)))
+                if isinstance(inp, ast.Compare):
+                    _evaluator(inp, "bin_left")
                 if isinstance(inp, ast.BinOp):
-                    left = inp.left
-                    op = inp.op
-                    right = inp.right
-                    ops = outr.ops[0]
-                    comp = outr.comparators[0]
-                    print("BINOP {}".format(ast.dump(outr)))
+                    _evaluator(inp, "bin_left")
+
+#                if isinstance(inp, ast.BinOp):
+#                    left = inp.left
+#                    op = inp.op
+#                    right = inp.right
+#                    ops = outr.ops[0]
+#                    comp = outr.comparators[0]
+#                    print("BINOP {}".format(ast.dump(outr)))
+#                    _evaluator(left, "left")
+#                    _evaluator(comp, "comp")
 
 
 
