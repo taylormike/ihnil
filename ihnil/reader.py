@@ -38,6 +38,7 @@ class ReadIHNIL(ast.NodeVisitor):
     count = 1
 
     def visit_If(self, node):
+        """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
             print(codegen.to_source(node) + "\n")
@@ -48,6 +49,7 @@ class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
     def visit_If(self, node):
+        """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
 
             self.next_line(node)
@@ -126,6 +128,7 @@ class ElseIHNIL(ast.NodeVisitor):
     count = 1
 
     def visit_If(self, node):
+        """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' number {} start line {}".format(self.count,
                                                                   node.lineno))
