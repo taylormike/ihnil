@@ -67,7 +67,7 @@ class WriteIHNIL(ast.NodeVisitor):
             elif decider == "c":
                 self._mark_complete()
             else:
-                print("Skipped")
+                print("No action taken")
 
     def next_line(self, node):
         """Parse nodes and provide optimized code."""
@@ -97,7 +97,7 @@ class WriteIHNIL(ast.NodeVisitor):
                     _evaluator(inp, "nest_right")
 
             _evaluator(node, "left")
-#            _evaluator(node, "comp")
+            _evaluator(node, "comp")
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
