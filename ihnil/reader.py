@@ -73,6 +73,9 @@ class WriteIHNIL(ast.NodeVisitor):
         """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
 
+            comparator = list() # test
+            variable = str() # test
+
             def _evaluator(inpt, choice):
                 if choice == "left":
                     inp = inpt.test.left
@@ -84,23 +87,50 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
+                    variable = inp # test
                     print("NAME {}".format(inp.id))
                 elif isinstance(inp, ast.Num):
+                    comparator.append(inp) # test
                     print("NUMBER {}".format(inp.n))
                 elif isinstance(inp, ast.Str):
+                    comparator.append(inp) # test
                     print("STRING {}".format(inp.s))
                 elif isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
+                    comparator.append(inp) # test
                     print("CONTAINER {}".format(ast.dump(inp)))
                 elif isinstance(inp, ast.BinOp):
                     _evaluator(inp, "nest_left")
+                    comparator.append(inp) # test
                     print("OP {}".format(ast.dump(inp.op)))
+                    comparator.append(ast.dump(inp.op)) # test
                     _evaluator(inp, "nest_right")
+                    comparator.append(inp) # test
 
+            operator = ast.dump(node.test.ops[0]) # test
+
+            # vvv temporary test printout code vvv
+            print("--- Instance of an 'if' ---")
             _evaluator(node, "left")
+            print(ast.dump(node.test.ops[0]))
             _evaluator(node, "comp")
+
+            print(variable, operator, comparator) # test
+
+            # TODO:
+            # establish ops[0] order/precedent list
+            # identify all user-defined variables
+            #   specify the type the variable is
+            # group similar user-defined variables
+            # pull in all ops[0] and comparators[0]
+            # identify comparators[0] types
+            #   see if comparators[0] are the same value
+            # sort ops[0] and comparators[0] around variables
+            # repair any possible errors in reordered code
+            # return as a text string
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
+            # TODO: ^ replace "prints" with storage variables
 
             self.next_line(node.body[0])
 
