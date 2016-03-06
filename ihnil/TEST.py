@@ -38,5 +38,6 @@ def listif(inp, num):
         if 6 > inp:
             if inp != "SPAMELOT":
                 if inp in [1, 2, 3, 4, 5]:
-                    if inp == (num % 2):
-                        print(inp)
+                    if inp != num:
+                        if inp == (num % 2):
+                            print(inp)
