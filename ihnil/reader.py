@@ -52,15 +52,10 @@ class WriteIHNIL(ast.NodeVisitor):
         """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
 
-            global variables
-            variables = list()
-
-            global holder
-            holder = list()
+            global segment
+            segment = dict()
 
             self.next_line(node)
-
-            print(variables, holder)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -95,11 +90,13 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
-                    variables.append(inp.id)
+                    items.append(inp.id)
+                    global variable
+                    variable = inp.id
                 elif isinstance(inp, ast.Num):
-                    items.append(ast.dump(inp))
+                    items.append(inp.n)
                 elif isinstance(inp, ast.Str):
-                    items.append(ast.dump(inp))
+                    items.append(inp.s)
                 elif isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
                     items.append(ast.dump(inp))
                 elif isinstance(inp, ast.BinOp):
@@ -111,33 +108,14 @@ class WriteIHNIL(ast.NodeVisitor):
             items.append(ast.dump(node.test.ops[0]))
             _evaluator(node, "comp")
 
-            holder.append(items)
+            segment[variable] = items
 
-            # TODO:
-            # for each line in the node
-            #  if the variable is unique
-            #   assign to "key" value
-            #    pull in the line operators ("ops")
-            #    pull in the fully validated argument ("left"/"comparators")
-            #     assign to dictionary "value"
+            print(items)
 
-            # TODO:
-            # establish ops[0] order/precedent list
-            # identify all user-defined variables
-            #   specify the type the variable is
-            # group similar user-defined variables
-            # pull in all ops[0] and comparators[0]
-            # identify comparators[0] types
-            #   see if comparators[0] are the same value
-            # sort ops[0] and comparators[0] around variables
-            # repair any possible errors in reordered code
-            # return as a text string
+            self.next_line(node.body[0])
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
-            # TODO: ^ replace "prints" with storage variables
-
-            self.next_line(node.body[0])
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""

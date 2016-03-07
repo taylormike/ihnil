@@ -35,9 +35,10 @@ class Basic():
 
 def listif(inp, num):
     if inp % 2 == 0:
-        if 6 > inp:
+        if 20 > inp:
             if inp != "SPAMELOT":
-                if inp in [1, 2, 3, 4, 5]:
+                if inp in [1, 2, 3]:
                     if inp != num:
-                        if inp == (num % 2):
-                            print(inp)
+                        if num + 10 != inp + 20:
+                            if inp == (num % 2):
+                                print(inp)
