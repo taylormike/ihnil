@@ -32,6 +32,18 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
+BINOPS = {"Add()": "+", "Sub()": "-",
+          "Mult()": "*", "Div()": "/",
+          "FloorDiv()": "//", "Mod": "%",
+          "Pow()": "**"}
+
+OPS = {"Eq()": "==", "NotEq()": "!=",
+       "Lt()": "<", "LtE()": "<=",
+       "Gt()": ">", "GtE()": ">=",
+       "Is()": "is", "IsNot()": "is not",
+       "In()": "in", "NotIn()": "not in"}
+
+
 class ReadIHNIL(ast.NodeVisitor):
     """This class provides simple error node code print out."""
 
@@ -51,9 +63,6 @@ class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
-
-            global segment
-            segment = dict()
 
             self.next_line(node)
 
@@ -76,8 +85,10 @@ class WriteIHNIL(ast.NodeVisitor):
         """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
 
-            global items
+            segment = dict()
             items = list()
+            variable = str()
+            counter = 0
 
             def _evaluator(inpt, choice):
                 if choice == "left":
@@ -90,9 +101,11 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
-                    items.append(inp.id)
-                    global variable
+#                    items.append(inp.id)
+                    nonlocal variable
                     variable = inp.id
+                    nonlocal counter
+                    counter += 1
                 elif isinstance(inp, ast.Num):
                     items.append(inp.n)
                 elif isinstance(inp, ast.Str):
@@ -108,9 +121,15 @@ class WriteIHNIL(ast.NodeVisitor):
             items.append(ast.dump(node.test.ops[0]))
             _evaluator(node, "comp")
 
-            segment[variable] = items
-
-            print(items)
+            if counter == 1:
+                print("ONE VARIABLE")
+                segment[variable] = items
+                print(segment)
+            elif counter == 2:
+                print("TWO VARIABLES")
+                print(items)
+            else:
+                print("THREE VARIABLES")
 
             self.next_line(node.body[0])
 
