@@ -31,17 +31,27 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
+#def func(inp):
+#    if inp in comp.keys():
+#        func_keys = comp.keys()
+#        func_values = comp.values()
+#        rem_key = inp
+#        rem_value = comp[inp]
+#        func_keys[0].remove(rem_key)
+#        func_values[0].remove(rem_value)
+#        print(func_keys)
+#        print(func_values)
 
 BINOPS = {"Add()": "+", "Sub()": "-",
           "Mult()": "*", "Div()": "/",
           "FloorDiv()": "//", "Mod": "%",
           "Pow()": "**"}
 
-OPS = {"Eq()": "==", "NotEq()": "!=",
-       "Lt()": "<", "LtE()": "<=",
-       "Gt()": ">", "GtE()": ">=",
-       "Is()": "is", "IsNot()": "is not",
-       "In()": "in", "NotIn()": "not in"}
+COMP = {"Gt()": ">", "Lt()": "<"}
+COMPE = {"GtE()": ">=", "LtE()": "<="}
+EQUAL = {"Eq()": "==", "NotEq()": "!="}
+IDENT = {"Is()": "is", "IsNot()": "is not"}
+INCLU = {"In()": "in", "NotIn()": "not in"}
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -85,10 +95,10 @@ class WriteIHNIL(ast.NodeVisitor):
         """Parse nodes and provide optimized code."""
         if "test" in node._fields and isinstance(node.test, ast.Compare):
 
-            segment = dict()
-            items = list()
             variable = str()
+            items = list()
             counter = 0
+            segment = dict()
 
             def _evaluator(inpt, choice):
                 if choice == "left":
@@ -101,9 +111,9 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
-#                    items.append(inp.id)
                     nonlocal variable
                     variable = inp.id
+                    items.append(inp.id)
                     nonlocal counter
                     counter += 1
                 elif isinstance(inp, ast.Num):
@@ -123,13 +133,16 @@ class WriteIHNIL(ast.NodeVisitor):
 
             if counter == 1:
                 print("ONE VARIABLE")
-                segment[variable] = items
-                print(segment)
             elif counter == 2:
                 print("TWO VARIABLES")
-                print(items)
             else:
                 print("THREE VARIABLES")
+
+            print(items)
+
+            # identify variable
+            #  check to see if in binop
+            #   pull in all binop items
 
             self.next_line(node.body[0])
 
