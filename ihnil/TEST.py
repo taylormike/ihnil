@@ -43,3 +43,8 @@ def listif(inp, num):
                             if num + 10 != inp + 20:
                                 if inp == (num % 2):
                                     print(inp)
+
+def brutal(val1, val2):
+    if val1 != 5:
+        if 1 < val2 < 10 < val1 < 20:
+            print("THE HOLY GRAIL")

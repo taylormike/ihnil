@@ -31,16 +31,6 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
-#def func(inp):
-#    if inp in comp.keys():
-#        func_keys = comp.keys()
-#        func_values = comp.values()
-#        rem_key = inp
-#        rem_value = comp[inp]
-#        func_keys[0].remove(rem_key)
-#        func_values[0].remove(rem_value)
-#        print(func_keys)
-#        print(func_values)
 
 BINOPS = {"Add()": "+", "Sub()": "-",
           "Mult()": "*", "Div()": "/",
@@ -100,11 +90,11 @@ class WriteIHNIL(ast.NodeVisitor):
             counter = 0
             segment = dict()
 
-            def _evaluator(inpt, choice):
+            def _evaluator(inpt, choice, comps=0):
                 if choice == "left":
                     inp = inpt.test.left
                 elif choice == "comp":
-                    inp = inpt.test.comparators[0]
+                    inp = inpt.test.comparators[comps]
                 elif choice == "nest_left":
                     inp = inpt.left
                 elif choice == "nest_right":
@@ -128,21 +118,23 @@ class WriteIHNIL(ast.NodeVisitor):
                     _evaluator(inp, "nest_right")
 
             _evaluator(node, "left")
-            items.append(ast.dump(node.test.ops[0]))
-            _evaluator(node, "comp")
+            for oper in node.test.ops:
+                items.append(ast.dump(oper))
+            num_of_comps = len(node.test.comparators) - 1
+            if num_of_comps == 0:
+                _evaluator(node, "comp")
+            else:
+                for number in range(num_of_comps):
+                    _evaluator(node, "comp", comps=number)
 
             if counter == 1:
                 print("ONE VARIABLE")
             elif counter == 2:
                 print("TWO VARIABLES")
             else:
-                print("THREE VARIABLES")
+                print("MORE VARIABLES")
 
             print(items)
-
-            # identify variable
-            #  check to see if in binop
-            #   pull in all binop items
 
             self.next_line(node.body[0])
 
