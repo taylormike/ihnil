@@ -2,6 +2,7 @@
 
 ## Description
 
+Source-to-source AST transformation and optimization.  
 Prounced: "eye-nil"  
 For use on Python code modules. :snake:  
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.  

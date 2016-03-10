@@ -31,27 +31,17 @@ args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
-#def func(inp):
-#    if inp in comp.keys():
-#        func_keys = comp.keys()
-#        func_values = comp.values()
-#        rem_key = inp
-#        rem_value = comp[inp]
-#        func_keys[0].remove(rem_key)
-#        func_values[0].remove(rem_value)
-#        print(func_keys)
-#        print(func_values)
 
 BINOPS = {"Add()": "+", "Sub()": "-",
           "Mult()": "*", "Div()": "/",
           "FloorDiv()": "//", "Mod": "%",
           "Pow()": "**"}
 
-COMP = {"Gt()": ">", "Lt()": "<"}
-COMPE = {"GtE()": ">=", "LtE()": "<="}
-EQUAL = {"Eq()": "==", "NotEq()": "!="}
-IDENT = {"Is()": "is", "IsNot()": "is not"}
-INCLU = {"In()": "in", "NotIn()": "not in"}
+STRICT = {"Gt()": ">", "Lt()": "<"}
+LOOSE = {"GtE()": ">=", "LtE()": "<="}
+EQUALITY = {"Eq()": "==", "NotEq()": "!="}
+IDENTITY = {"Is()": "is", "IsNot()": "is not"}
+INCLUSION = {"In()": "in", "NotIn()": "not in"}
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -97,8 +87,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
             variable = str()
             items = list()
+            segment = list()
             counter = 0
-            segment = dict()
 
             def _evaluator(inpt, choice):
                 if choice == "left":
@@ -111,9 +101,7 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
-                    nonlocal variable
-                    variable = inp.id
-                    items.append(inp.id)
+                    items.append("#" + inp.id)
                     nonlocal counter
                     counter += 1
                 elif isinstance(inp, ast.Num):
@@ -132,17 +120,45 @@ class WriteIHNIL(ast.NodeVisitor):
             _evaluator(node, "comp")
 
             if counter == 1:
-                print("ONE VARIABLE")
+                if segment:
+                    segment.append("and")
+                    segment.append(items)
+                else:
+                    segment.append(items)
+#                for item in items:
+#                    if isinstance(item, str) and "#" in item:
+#                        print(item)
+
+                # need:
+                #  : items -> list generated from items of each line
+                #  : variables -> list of all node line variables
+                #  : segment -> combined & ordered list of all items lists
+                # pseudo code:
+                # for each item in items
+                #  find the variable
+                #  if the variable is in the list of variables
+                #   check the items list operator type
+                #   if operators in items and segment are in same group
+                #    check the structure of items
+                #    if structures (items & segments) are the same
+                #    (e.g. both have var on the left)
+                #     reverse structure of items
+                #     if operator in STRICT or LOOSE
+                #      reverse items operator (opposite within STRICT/LOOSE)
+                #      remove var
+                #      add to front of segment
+                #     else add to the front of segment
+                #      remove var
+                #   else add "and" & items to segment
+                #    keep info on segment structure
+                # notes on code:
+                #  : "if" statements will likely be individual functions
+                #    that will be called as needed
+
             elif counter == 2:
-                print("TWO VARIABLES")
+                print("TWO VARIABLES {}".format(items))
             else:
-                print("THREE VARIABLES")
-
-            print(items)
-
-            # identify variable
-            #  check to see if in binop
-            #   pull in all binop items
+                print("MORE VARIABLES {}".format(items))
 
             self.next_line(node.body[0])
 
