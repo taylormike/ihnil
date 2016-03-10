@@ -37,11 +37,11 @@ BINOPS = {"Add()": "+", "Sub()": "-",
           "FloorDiv()": "//", "Mod": "%",
           "Pow()": "**"}
 
-COMP = {"Gt()": ">", "Lt()": "<"}
-COMPE = {"GtE()": ">=", "LtE()": "<="}
-EQUAL = {"Eq()": "==", "NotEq()": "!="}
-IDENT = {"Is()": "is", "IsNot()": "is not"}
-INCLU = {"In()": "in", "NotIn()": "not in"}
+STRICT = {"Gt()": ">", "Lt()": "<"}
+LOOSE = {"GtE()": ">=", "LtE()": "<="}
+EQUALITY = {"Eq()": "==", "NotEq()": "!="}
+IDENTITY = {"Is()": "is", "IsNot()": "is not"}
+INCLUSION = {"In()": "in", "NotIn()": "not in"}
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -87,8 +87,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
             variable = str()
             items = list()
+            segment = list()
             counter = 0
-            segment = dict()
 
             def _evaluator(inpt, choice, comps=0):
                 if choice == "left":
@@ -101,9 +101,7 @@ class WriteIHNIL(ast.NodeVisitor):
                     inp = inpt.right
 
                 if isinstance(inp, ast.Name):
-                    nonlocal variable
-                    variable = inp.id
-                    items.append(inp.id)
+                    items.append("#" + inp.id)
                     nonlocal counter
                     counter += 1
                 elif isinstance(inp, ast.Num):
