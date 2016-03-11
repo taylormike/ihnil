@@ -83,7 +83,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def next_line(self, node):
         """Parse nodes and provide optimized code."""
-        if "test" in node._fields and isinstance(node.test, ast.Compare):
+        if ("test" in node._fields and isinstance(node.test, ast.Compare)
+            and node.orelse == []):
 
             variable = str()
             items = list()
