@@ -64,7 +64,11 @@ class WriteIHNIL(ast.NodeVisitor):
         """Overridden ast module method."""
         if isinstance(node.body[0], ast.If):
 
-            self.next_line(node)
+            segment = list()
+
+            self.next_line(node, segment)
+
+            print(segment)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -81,14 +85,13 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 print("No action taken")
 
-    def next_line(self, node):
+    def next_line(self, node, holder):
         """Parse nodes and provide optimized code."""
         if ("test" in node._fields and isinstance(node.test, ast.Compare)
             and node.orelse == []):
 
             variable = str()
             items = list()
-            segment = list()
             counter = 0
 
             def _evaluator(inpt, choice, comps=0):
@@ -112,30 +115,36 @@ class WriteIHNIL(ast.NodeVisitor):
                 elif isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
                     items.append(ast.dump(inp))
                 elif isinstance(inp, ast.BinOp):
+                    items.append("(")
                     _evaluator(inp, "nest_left")
                     items.append(ast.dump(inp.op))
                     _evaluator(inp, "nest_right")
+                    items.append(")")
 
             _evaluator(node, "left")
             for oper in node.test.ops:
                 items.append(ast.dump(oper))
-            num_of_comps = len(node.test.comparators) - 1
+            num_of_comps = len(node.test.comparators)
             if num_of_comps == 0:
                 _evaluator(node, "comp")
             else:
                 for number in range(num_of_comps):
                     _evaluator(node, "comp", comps=number)
 
-            if counter == 1:
-                print("ONE VARIABLE")
-            elif counter == 2:
-                print("TWO VARIABLES")
+#            if counter == 1:
+#                print("=" * 40 + " # 1")
+#            elif counter == 2:
+#                print("=" * 40 + " # 2")
+#            else:
+#                print("=" * 40 + " # MORE")
+
+            if holder:
+                holder.append(" and ")
+                holder.append(items)
             else:
-                print("MORE VARIABLES")
+                holder.append(items)
 
-            print(items)
-
-            self.next_line(node.body[0])
+            self.next_line(node.body[0], holder)
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
