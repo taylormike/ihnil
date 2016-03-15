@@ -43,6 +43,8 @@ EQUALITY = {"Eq()": "==", "NotEq()": "!="}
 IDENTITY = {"Is()": "is", "IsNot()": "is not"}
 INCLUSION = {"In()": "in", "NotIn()": "not in"}
 
+operators = [STRICT, LOOSE, EQUALITY, IDENTITY, INCLUSION]
+
 
 class ReadIHNIL(ast.NodeVisitor):
     """This class provides simple error node code print out."""
@@ -88,11 +90,10 @@ class WriteIHNIL(ast.NodeVisitor):
     def next_line(self, node, holder):
         """Parse nodes and provide optimized code."""
         if ("test" in node._fields and isinstance(node.test, ast.Compare)
-            and node.orelse == []):
+                and node.orelse == []):
 
             variable = str()
             items = list()
-            counter = 0
 
             def _evaluator(inpt, choice, comps=0):
                 if choice == "left":
@@ -106,8 +107,6 @@ class WriteIHNIL(ast.NodeVisitor):
 
                 if isinstance(inp, ast.Name):
                     items.append("#" + inp.id)
-                    nonlocal counter
-                    counter += 1
                 elif isinstance(inp, ast.Num):
                     items.append(inp.n)
                 elif isinstance(inp, ast.Str):
@@ -122,24 +121,17 @@ class WriteIHNIL(ast.NodeVisitor):
                     items.append(")")
 
             _evaluator(node, "left")
-            for oper in node.test.ops:
-                items.append(ast.dump(oper))
+            for operator in node.test.ops:
+                items.append(ast.dump(operator))
             num_of_comps = len(node.test.comparators)
-            if num_of_comps == 0:
+            if num_of_comps == 1:
                 _evaluator(node, "comp")
             else:
                 for number in range(num_of_comps):
                     _evaluator(node, "comp", comps=number)
 
-#            if counter == 1:
-#                print("=" * 40 + " # 1")
-#            elif counter == 2:
-#                print("=" * 40 + " # 2")
-#            else:
-#                print("=" * 40 + " # MORE")
-
             if holder:
-                holder.append(" and ")
+                holder.append("and")
                 holder.append(items)
             else:
                 holder.append(items)
