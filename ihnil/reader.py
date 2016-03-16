@@ -32,18 +32,10 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-BINOPS = {"Add()": "+", "Sub()": "-",
-          "Mult()": "*", "Div()": "/",
-          "FloorDiv()": "//", "Mod": "%",
-          "Pow()": "**"}
+BINOPS = {"Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"}
 
-STRICT = {"Gt()": ">", "Lt()": "<"}
-LOOSE = {"GtE()": ">=", "LtE()": "<="}
-EQUALITY = {"Eq()": "==", "NotEq()": "!="}
-IDENTITY = {"Is()": "is", "IsNot()": "is not"}
-INCLUSION = {"In()": "in", "NotIn()": "not in"}
-
-operators = [STRICT, LOOSE, EQUALITY, IDENTITY, INCLUSION]
+ops = ["Gt()", "Lt()", "GtE()", "LtE()", "Eq()", "NotEq()",
+       "Is()", "IsNot()", "In()", "NotIn()"]
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -52,7 +44,7 @@ class ReadIHNIL(ast.NodeVisitor):
     count = 1
 
     def visit_If(self, node):
-        """Overridden ast module method."""
+        """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
             print(codegen.to_source(node) + "\n")
@@ -63,80 +55,18 @@ class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
     def visit_If(self, node):
-        """Overridden ast module method."""
-        if isinstance(node.body[0], ast.If):
-
+        """Subclassed ast module method."""
+        if isinstance(node.body[0], ast.If) and node.orelse == []:
             segment = list()
-
             self.next_line(node, segment)
-
+            segment.sort(key=lambda x: ops.index(ast.dump(x.test.ops[0])))
             print(segment)
 
-            decider = input("Would you like to:\n"
-                            "Accept change  ->  'a'\n"
-                            "Edit manually  ->  'e'\n"
-                            "Mark complete  ->  'c'\n"
-                            "Provide your choice and hit 'enter': ")
-
-            if decider == "a":
-                self._accept_change()
-            elif decider == "e":
-                self._edit_manually()
-            elif decider == "c":
-                self._mark_complete()
-            else:
-                print("No action taken")
-
-    def next_line(self, node, holder):
-        """Parse nodes and provide optimized code."""
-        if ("test" in node._fields and isinstance(node.test, ast.Compare)
-                and node.orelse == []):
-
-            variable = str()
-            items = list()
-
-            def _evaluator(inpt, choice, comps=0):
-                if choice == "left":
-                    inp = inpt.test.left
-                elif choice == "comp":
-                    inp = inpt.test.comparators[comps]
-                elif choice == "nest_left":
-                    inp = inpt.left
-                elif choice == "nest_right":
-                    inp = inpt.right
-
-                if isinstance(inp, ast.Name):
-                    items.append("#" + inp.id)
-                elif isinstance(inp, ast.Num):
-                    items.append(inp.n)
-                elif isinstance(inp, ast.Str):
-                    items.append(inp.s)
-                elif isinstance(inp, (ast.List, ast.Dict, ast.Tuple, ast.Set)):
-                    items.append(ast.dump(inp))
-                elif isinstance(inp, ast.BinOp):
-                    items.append("(")
-                    _evaluator(inp, "nest_left")
-                    items.append(ast.dump(inp.op))
-                    _evaluator(inp, "nest_right")
-                    items.append(")")
-
-            _evaluator(node, "left")
-            for operator in node.test.ops:
-                items.append(ast.dump(operator))
-            num_of_comps = len(node.test.comparators)
-            if num_of_comps == 1:
-                _evaluator(node, "comp")
-            else:
-                for number in range(num_of_comps):
-                    _evaluator(node, "comp", comps=number)
-
-            if holder:
-                holder.append("and")
-                holder.append(items)
-            else:
-                holder.append(items)
-
-            self.next_line(node.body[0], holder)
+    def next_line(self, node, node_list):
+        """Node line evaluator function called recursively."""
+        if isinstance(node, ast.If) and node.orelse == []:
+            node_list.append(node)
+            self.next_line(node.body[0], node_list)
 
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
@@ -165,7 +95,7 @@ class ElseIHNIL(ast.NodeVisitor):
     count = 1
 
     def visit_If(self, node):
-        """Overridden ast module method."""
+        """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' number {} start line {}".format(self.count,
                                                                   node.lineno))
