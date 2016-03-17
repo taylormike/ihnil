@@ -32,7 +32,7 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-BINOPS = {"Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"}
+BINOPS = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
 
 ops = ["Gt()", "Lt()", "GtE()", "LtE()", "Eq()", "NotEq()",
        "Is()", "IsNot()", "In()", "NotIn()"]
@@ -57,19 +57,51 @@ class WriteIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If) and node.orelse == []:
+
             segment = list()
-            self.next_line(node, segment)
+            variables = list()
+
+            self.next_line(node, segment, variables)
+
+            variables = list(set(variables))
+
             segment.sort(key=lambda x: ops.index(ast.dump(x.test.ops[0])))
+
             print(segment)
+            print(variables)
 
-    def next_line(self, node, node_list):
-        """Node line evaluator function called recursively."""
+    def next_line(self, node, seg_list, var_list):
+        """Node line evaluation function called recursively."""
         if isinstance(node, ast.If) and node.orelse == []:
-            node_list.append(node)
-            self.next_line(node.body[0], node_list)
+            seg_list.append(node)
 
+            self.evaluator(node, "left", var_list)
+            self.evaluator(node, "comparators", var_list)
+
+            self.next_line(node.body[0], seg_list, var_list)
+
+    def evaluator(self, node, option, var_list):
+        if option == "left":
+            inp = node.test.left
+        elif option == "comparators":
+            inp = node.test.comparators[0]
+        elif option == "bin_left":
+            inp = node.left
+        elif option == "bin_right":
+            inp = node.right
+
+        if isinstance(inp, ast.Name):
+            var_list.append(inp.id)
+        if isinstance(inp, ast.BinOp):
+            self.evaluator(inp, "bin_left", var_list)
+            self.evaluator(inp, "bin_right", var_list)
+
+
+
+            # TODO: lambda function to sort by variables
             # TODO: algorithm to optimize structure for if test
             # TODO: store optimized loops in separate variables
+            # TODO: reestablish user choice & next node option
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
