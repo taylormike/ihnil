@@ -65,10 +65,25 @@ class WriteIHNIL(ast.NodeVisitor):
 
             variables = list(set(variables))
 
-            segment.sort(key=lambda x: ops.index(ast.dump(x.test.ops[0])))
+            segment.sort(key=lambda x: (self.ops_find(x), self.var_find(x)))
 
             print(segment)
             print(variables)
+
+            decider = input("Would you like to:\n"
+                            "Accept change  ->  'a'\n"
+                            "Edit manually  ->  'e'\n"
+                            "Mark complete  ->  'c'\n"
+                            "Provide your choice and hit 'enter': ")
+
+            if decider == "a":
+                self._accept_change()
+            elif decider == "e":
+                self._edit_manually()
+            elif decider == "c":
+                self._mark_complete()
+            else:
+                print("No action taken")
 
     def next_line(self, node, seg_list, var_list):
         """Node line evaluation function called recursively."""
@@ -92,11 +107,29 @@ class WriteIHNIL(ast.NodeVisitor):
 
         if isinstance(inp, ast.Name):
             var_list.append(inp.id)
-        if isinstance(inp, ast.BinOp):
+        elif isinstance(inp, ast.BinOp):
             self.evaluator(inp, "bin_left", var_list)
             self.evaluator(inp, "bin_right", var_list)
 
+    def ops_find(self, item):
+        return ops.index(ast.dump(item.test.ops[0]))
 
+    def var_find(self, item, option="left"):
+        if option == "left":
+            inp = item.test.left
+        elif option == "comparators":
+            inp = item.test.comparators[0]
+        elif option == "bin_left":
+            inp = item.left
+        elif option == "bin_right":
+            inp = item.right
+
+        if isinstance(inp, ast.Name):
+            return inp.id
+            self.var_find(item, "comparators")
+        elif isinstance(inp, ast.BinOp):
+            self.var_find(inp, "bin_left")
+            self.var_find(inp, "bin_right")
 
             # TODO: lambda function to sort by variables
             # TODO: algorithm to optimize structure for if test
