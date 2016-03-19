@@ -32,7 +32,7 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-BINOPS = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
+binops = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
 
 ops = ["Gt()", "Lt()", "GtE()", "LtE()", "Eq()", "NotEq()",
        "Is()", "IsNot()", "In()", "NotIn()"]
@@ -136,9 +136,11 @@ class WriteIHNIL(ast.NodeVisitor):
             self._var_find(inp, "bin_right")
 
             # TODO: lambda function to sort by variables
-            # TODO: algorithm to optimize structure for if test
+            # TODO: function to handle multiple variables in one line
+            # TODO: built out algebraic optimization for binops nodes
+            # TODO: algorithm to compare nodes within the node list
+            # TODO: delete redundancies in the compared nodes
             # TODO: store optimized loops in separate variables
-            # TODO: reestablish user choice & next node option
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
