@@ -48,6 +48,7 @@ class ReadIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
             print(codegen.to_source(node) + "\n")
+            input("Hit Enter to continue\n")
             self.count += 1
 
 
@@ -65,7 +66,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
             variables = list(set(variables))
 
-            segment.sort(key=lambda x: (self.ops_find(x), self.var_find(x)))
+            segment.sort(key=lambda x: (self._ops_find(x), self._var_find(x)))
 
             print(segment)
             print(variables)
@@ -74,7 +75,7 @@ class WriteIHNIL(ast.NodeVisitor):
                             "Accept change  ->  'a'\n"
                             "Edit manually  ->  'e'\n"
                             "Mark complete  ->  'c'\n"
-                            "Provide your choice and hit 'enter': ")
+                            "Provide your choice and hit Enter: ")
 
             if decider == "a":
                 self._accept_change()
@@ -90,12 +91,13 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node, ast.If) and node.orelse == []:
             seg_list.append(node)
 
-            self.evaluator(node, "left", var_list)
-            self.evaluator(node, "comparators", var_list)
+            self._evaluator(node, "left", var_list)
+            self._evaluator(node, "comparators", var_list)
 
             self.next_line(node.body[0], seg_list, var_list)
 
-    def evaluator(self, node, option, var_list):
+    def _evaluator(self, node, option, var_list):
+        # TODO: write docstring
         if option == "left":
             inp = node.test.left
         elif option == "comparators":
@@ -108,13 +110,15 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(inp, ast.Name):
             var_list.append(inp.id)
         elif isinstance(inp, ast.BinOp):
-            self.evaluator(inp, "bin_left", var_list)
-            self.evaluator(inp, "bin_right", var_list)
+            self._evaluator(inp, "bin_left", var_list)
+            self._evaluator(inp, "bin_right", var_list)
 
-    def ops_find(self, item):
+    def _ops_find(self, item):
+        # TODO: write docstring
         return ops.index(ast.dump(item.test.ops[0]))
 
-    def var_find(self, item, option="left"):
+    def _var_find(self, item, option="left"):
+        # TODO: write docstring
         if option == "left":
             inp = item.test.left
         elif option == "comparators":
@@ -126,10 +130,10 @@ class WriteIHNIL(ast.NodeVisitor):
 
         if isinstance(inp, ast.Name):
             return inp.id
-            self.var_find(item, "comparators")
+            self._var_find(item, "comparators")
         elif isinstance(inp, ast.BinOp):
-            self.var_find(inp, "bin_left")
-            self.var_find(inp, "bin_right")
+            self._var_find(inp, "bin_left")
+            self._var_find(inp, "bin_right")
 
             # TODO: lambda function to sort by variables
             # TODO: algorithm to optimize structure for if test
