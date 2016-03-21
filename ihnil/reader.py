@@ -47,6 +47,7 @@ class ReadIHNIL(ast.NodeVisitor):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
+            print("[> Error node starts on {} <]\n".format(node.lineno))
             print(codegen.to_source(node) + "\n")
             input("Hit Enter to continue\n")
             self.count += 1
@@ -91,13 +92,13 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node, ast.If) and node.orelse == []:
             seg_list.append(node)
 
-            self._evaluator(node, "left", var_list)
-            self._evaluator(node, "comparators", var_list)
+            self._var_list(node, "left", var_list)
+            self._var_list(node, "comparators", var_list)
 
             self.next_line(node.body[0], seg_list, var_list)
 
-    def _evaluator(self, node, option, var_list):
-        # TODO: write docstring
+    def _var_list(self, node, option, var_list):
+        """List building method for use in the lambda sorting."""
         if option == "left":
             inp = node.test.left
         elif option == "comparators":
@@ -110,33 +111,45 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(inp, ast.Name):
             var_list.append(inp.id)
         elif isinstance(inp, ast.BinOp):
-            self._evaluator(inp, "bin_left", var_list)
-            self._evaluator(inp, "bin_right", var_list)
+            self._var_list(inp, "bin_left", var_list)
+            self._var_list(inp, "bin_right", var_list)
 
     def _ops_find(self, item):
-        # TODO: write docstring
+        """First method for lambda sorting according to operator list."""
         return ops.index(ast.dump(item.test.ops[0]))
 
-    def _var_find(self, item, option="left"):
-        # TODO: write docstring
-        if option == "left":
-            inp = item.test.left
-        elif option == "comparators":
-            inp = item.test.comparators[0]
-        elif option == "bin_left":
+    def _var_find(self, item):
+        """Second method for lambda sorting according to variable names."""
+        inp = item.test.left
+        if isinstance(inp, ast.Name):
+            return inp.id
+        elif isinstance(inp, ast.BinOp):
+            return self._binop_find(inp)
+        else:
+            return self._comp_find(item)
+
+    def _binop_find(self, item, side_choice="left"):
+        """First sub-method called by the variable sorting algorithm."""
+        if side_choice == "left":
             inp = item.left
-        elif option == "bin_right":
+        elif side_choice == "right":
             inp = item.right
 
         if isinstance(inp, ast.Name):
             return inp.id
-            self._var_find(item, "comparators")
         elif isinstance(inp, ast.BinOp):
-            self._var_find(inp, "bin_left")
-            self._var_find(inp, "bin_right")
+            self._binop_find(inp, side_choice="left")
+        else:
+            self._binop_find(item, side_choice="right")
 
-            # TODO: lambda function to sort by variables
-            # TODO: function to handle multiple variables in one line
+    def _comp_find(self, item):
+        """Second sub-method called by the variable sorting algorithm."""
+        for itm in item.test.comparators:
+            if isinstance(itm, ast.Name):
+                return itm.id
+            else:
+                self._binop_find(itm)
+
             # TODO: built out algebraic optimization for binops nodes
             # TODO: algorithm to compare nodes within the node list
             # TODO: delete redundancies in the compared nodes

@@ -31,7 +31,7 @@ Currently only available for Python 3.
 
 Please adhere to ` pep8 ` standards when contributing to this project.  
 - The official reference **style guide** can be found [here](https://www.python.org/dev/peps/pep-0008/)  
-- The **command line tool** for Python files can be found [here](https://pypi.python.org/pypi/pep8)  
+- The **command line tool** for static analysis of Python files can be found [here](https://pypi.python.org/pypi/pep8)  
 
 Pull requests will only be accepted through [Github](https://github.com/)  
 
