@@ -120,16 +120,23 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def _var_find(self, item):
         """Second method for lambda sorting according to variable names."""
-        inp = item.test.left
-        if isinstance(inp, ast.Name):
-            return inp.id
-        elif isinstance(inp, ast.BinOp):
-            return self._binop_find(inp)
+        if isinstance(item.test, ast.Call):
+            return item.text.func.id
         else:
-            return self._comp_find(item)
+            inp = item.test.left
+            if isinstance(inp, ast.Name):
+                return inp.id
+            elif isinstance(inp, ast.BinOp):
+                return self._binop_find(inp)
+            else:
+                return self._comp_find(item)
 
     def _binop_find(self, item, side_choice="left"):
-        """First sub-method called by the variable sorting algorithm."""
+        """
+        First sub-method called by the variable sorting algorithm.
+
+        Used in parsing binary operator statements.
+        """
         if side_choice == "left":
             inp = item.left
         elif side_choice == "right":
@@ -143,7 +150,11 @@ class WriteIHNIL(ast.NodeVisitor):
             self._binop_find(item, side_choice="right")
 
     def _comp_find(self, item):
-        """Second sub-method called by the variable sorting algorithm."""
+        """
+        Second sub-method called by the variable sorting algorithm.
+
+        Used in running through the items in the right-side comparators list.
+        """
         for itm in item.test.comparators:
             if isinstance(itm, ast.Name):
                 return itm.id
