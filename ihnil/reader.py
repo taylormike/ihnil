@@ -100,7 +100,10 @@ class WriteIHNIL(ast.NodeVisitor):
     def _var_list(self, node, option, var_list):
         """List building method for use in the lambda sorting."""
         if option == "left":
-            inp = node.test.left
+            if isinstance(node.test, ast.Call):
+                var_list.append(node.test.func.id)
+            else:
+                inp = node.test.left
         elif option == "comparators":
             inp = node.test.comparators[0]
         elif option == "bin_left":
