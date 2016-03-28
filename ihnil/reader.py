@@ -32,10 +32,15 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-binops = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
+binops = ["Add()", "Sub()",
+          "Mult()", "Div()",
+          "FloorDiv()", "Mod", "Pow()"]
 
-ops = ["Gt()", "Lt()", "GtE()", "LtE()", "Eq()", "NotEq()",
-       "Is()", "IsNot()", "In()", "NotIn()"]
+ops = ["Gt()", "Lt()",
+       "GtE()", "LtE()",
+       "Eq()", "NotEq()",
+       "Is()", "IsNot()",
+       "In()", "NotIn()"]
 
 
 class ReadIHNIL(ast.NodeVisitor):
