@@ -36,11 +36,13 @@ binops = ["Add()", "Sub()",
           "Mult()", "Div()",
           "FloorDiv()", "Mod", "Pow()"]
 
-ops = ["Gt()", "Lt()",
-       "GtE()", "LtE()",
-       "Eq()", "NotEq()",
-       "Is()", "IsNot()",
-       "In()", "NotIn()"]
+strict = ["Gt()", "Lt()"]
+loose = ["GtE()", "LtE()"]
+equal = ["Eq()", "NotEq()"]
+identity = ["Is()", "IsNot()"]
+inclusion = ["In()", "NotIn()"]
+
+operators = [strict, loose, equal, identity, inclusion]
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -66,16 +68,10 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             segment = list()
-            variables = list()
 
-            self.next_line(node, segment, variables)
-
-            variables = list(set(variables))
-
-            segment.sort(key=lambda x: (self._ops_find(x), self._var_find(x)))
+            self.next_line(node, segment)
 
             print(segment)
-            print(variables)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -92,87 +88,29 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 print("No action taken")
 
-    def next_line(self, node, seg_list, var_list):
+    def next_line(self, node, seg_list):
         """Node line evaluation function called recursively."""
         if isinstance(node, ast.If) and node.orelse == []:
             seg_list.append(node)
 
-            self._var_list(node, "left", var_list)
-            self._var_list(node, "comparators", var_list)
+            self.next_line(node.body[0], seg_list)
 
-            self.next_line(node.body[0], seg_list, var_list)
+    def sort_algo(self, node_list):
+        for node in node_list:
+            pass
 
-    def _var_list(self, node, option, var_list):
-        """List building method for use in the lambda sorting."""
-        if option == "left":
-            if isinstance(node.test, ast.Call):
-                var_list.append(node.test.func.id)
-            else:
-                inp = node.test.left
-        elif option == "comparators":
-            inp = node.test.comparators[0]
-        elif option == "bin_left":
-            inp = node.left
-        elif option == "bin_right":
-            inp = node.right
+    def _find_vars(self):
+        # TODO: for identifying variables within nodes
+        pass
 
-        if isinstance(inp, ast.Name):
-            var_list.append(inp.id)
-        elif isinstance(inp, ast.BinOp):
-            self._var_list(inp, "bin_left", var_list)
-            self._var_list(inp, "bin_right", var_list)
+    def _sort_binop(self):
+        # TODO: for sorting BinOp nodes
+        pass
 
-    def _ops_find(self, item):
-        """First method for lambda sorting according to operator list."""
-        return ops.index(ast.dump(item.test.ops[0]))
+    def _sort_comp(self):
+        # TODO: for sorting comparators list
+        pass
 
-    def _var_find(self, item):
-        """Second method for lambda sorting according to variable names."""
-        if isinstance(item.test, ast.Call):
-            return item.text.func.id
-        else:
-            inp = item.test.left
-            if isinstance(inp, ast.Name):
-                return inp.id
-            elif isinstance(inp, ast.BinOp):
-                return self._binop_find(inp)
-            else:
-                return self._comp_find(item)
-
-    def _binop_find(self, item, side_choice="left"):
-        """
-        First sub-method called by the variable sorting algorithm.
-
-        Used in parsing binary operator statements.
-        """
-        if side_choice == "left":
-            inp = item.left
-        elif side_choice == "right":
-            inp = item.right
-
-        if isinstance(inp, ast.Name):
-            return inp.id
-        elif isinstance(inp, ast.BinOp):
-            self._binop_find(inp, side_choice="left")
-        else:
-            self._binop_find(item, side_choice="right")
-
-    def _comp_find(self, item):
-        """
-        Second sub-method called by the variable sorting algorithm.
-
-        Used in running through the items in the right-side comparators list.
-        """
-        for itm in item.test.comparators:
-            if isinstance(itm, ast.Name):
-                return itm.id
-            else:
-                self._binop_find(itm)
-
-            # TODO: built out algebraic optimization for binops nodes
-            # TODO: algorithm to compare nodes within the node list
-            # TODO: delete redundancies in the compared nodes
-            # TODO: store optimized loops in separate variables
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
