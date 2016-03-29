@@ -68,6 +68,7 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             segment = list()
+            improved = list()
 
             self.next_line(node, segment)
 
@@ -95,9 +96,13 @@ class WriteIHNIL(ast.NodeVisitor):
 
             self.next_line(node.body[0], seg_list)
 
-    def sort_algo(self, node_list):
-        for node in node_list:
-            pass
+    def sort_algo(self, start_list, end_list):
+        for node in start_list:
+            if len(node.body[0].test.ops) > 1:
+                end_list.append(node)
+            else:
+                pass
+                # TODO: expand further operation here
 
     def _find_vars(self):
         # TODO: for identifying variables within nodes
