@@ -68,7 +68,6 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             segment = list()
-            improved = list()
 
             self.next_line(node, segment)
 
@@ -101,21 +100,37 @@ class WriteIHNIL(ast.NodeVisitor):
             if len(node.body[0].test.ops) > 1:
                 end_list.append(node)
             else:
-                pass
-                # TODO: expand further operation here
+                pass  # more operations here
 
-    def _find_vars(self):
-        # TODO: for identifying variables within nodes
-        pass
-
-    def _sort_binop(self):
-        # TODO: for sorting BinOp nodes
-        pass
-
-    def _sort_comp(self):
-        # TODO: for sorting comparators list
-        pass
-
+# idea 1:
+#
+# definitions:
+# error node        -> group of nested if statements
+# error lineno      -> each individual if statement line
+# fixed list        -> collection of temporarily optimized lines
+# holder list       -> temporary holder for unmatched optimized lines
+#
+# structure:
+# look at each error line of the error node
+# check if there is one than more comparator operator in the error line
+# ^ if there is then append the error node to the fixed list
+# ^ else run the full parsing operation
+# if the fixed list is empty
+# ^ if there is only one optimized (one variable) line
+# ^ ^ add the optimized line to the fixed list
+# ^ else add all possible optimizations (multiple variables) to a holder list
+# ^ add the holder list to the fixed list
+# else if the fixed list is not empty
+# ^ compare each possible optimized alternative (one/more variables)
+# ^ to each of the items within fixed list
+# ^ ^ if the item in fixed list is a holder list
+# ^ ^ ^ compare each of the optimzed alternatives to each holder list item
+# ^ ^ if the comparision fits 1. variable and 2. operator family
+# ^ ^ ^ merge the two lines together
+# ^ ^ ^ if the compared item was in a holder list
+# ^ ^ ^ ^ delete the holder list
+# ^ ^ ^ delete all optimized alternatives for the current error line
+# return a fully optimzied list
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
