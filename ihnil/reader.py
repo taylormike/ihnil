@@ -32,9 +32,7 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-binops = ["Add()", "Sub()",
-          "Mult()", "Div()",
-          "FloorDiv()", "Mod", "Pow()"]
+binops = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
 
 strict = ["Gt()", "Lt()"]
 loose = ["GtE()", "LtE()"]
@@ -67,11 +65,7 @@ class WriteIHNIL(ast.NodeVisitor):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
-            segment = list()
-
-            self.next_line(node, segment)
-
-            print(segment)
+            self.next_line(node)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -88,21 +82,70 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 print("No action taken")
 
-    def next_line(self, node, seg_list):
+    def next_line(self, node, seg_list=list()):
         """Node line evaluation function called recursively."""
         if isinstance(node, ast.If) and node.orelse == []:
             seg_list.append(node)
 
             self.next_line(node.body[0], seg_list)
+            # TODO: return the list of error node lines
 
     def sort_algo(self, start_list, end_list):
-        for node in start_list:
-            if len(node.body[0].test.ops) > 1:
-                end_list.append(node)
+        # Note: start_list  -> input list of unordered error node lines
+        # Note: end_list    -> returned list of sorted/optimized node lines
+        for line in start_list:
+            if len(line.body[0].test.ops) > 1:
+                end_list.append(line)
             else:
-                pass  # more operations here
+                # TODO:
+                # include "isinstance" handling -> ast.Call
+                # include "True/False" handling -> ast.NameConstant
+                # include variable handline     -> ast.Name
+                pass
+                # TODO: various function call operations here
 
-# idea 1:
+    def find_vars(self, input_line, side_choice):
+        if side_choice == "left":
+            eval_value = input_line.body[0].test.left
+        elif side_choice == "comp":
+            eval_value = input_line.body[0].test.comparators[0]
+
+        if isinstance(eval_value, ast.Name):
+            pass
+            # TODO: call sorter function
+        elif isinstance(eval_value, ast.BinOp):
+            find_binop(eval_value, bin_choice="left")
+        else:
+            find_vars(input_line, side_choice="comp")
+
+    def find_binop(self, input_value, bin_choice):
+        if bin_choice == "left":
+            bin_value = input_value.left
+        elif bin_choice == "right":
+            bin_value = input_value.right
+
+        if isinstance(bin_value, ast.Name):
+            sorter(found_in="binop")
+        elif isinstance(bin_value, ast.BinOp):
+            find_binop(bin_value, bin_choice="left")
+        else:
+            find_binop(input_value, bin_choice="right")
+
+    def sorter(self, found_in):
+        if found_in == "left":
+            pass
+        elif found_in == "binop":
+            pass
+        elif found_in == "comp":
+            pass
+
+    # TODO: needed functions:
+    # find variables        -> takes the left side of error line
+    # parse binops          -> activated if needed
+    # parse comparators     -> activated if needed
+    # sort function         -> called following each parser
+
+# TODO: idea 1:
 #
 # definitions:
 # error node        -> group of nested if statements
@@ -158,8 +201,8 @@ class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
-            print("[> Nested 'if' number {} start line {}".format(self.count,
-                                                                  node.lineno))
+            print("[> Nested 'if' number {} start \
+                  line {}".format(self.count, node.lineno))
             self._end_line(node, self.count)
             self.count += 1
 
@@ -169,8 +212,8 @@ class ElseIHNIL(ast.NodeVisitor):
             self.endno = node.lineno
             self._end_line(node.body[0], count)
         else:
-            print("[> Nested 'if' number {} end line {}".format(count,
-                                                                self.endno))
+            print("[> Nested 'if' number {} end \
+                  line {}".format(count, self.endno))
 
 
 if file_extension == ".py":
