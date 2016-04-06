@@ -82,62 +82,78 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 print("No action taken")
 
-    def next_line(self, node, seg_list=list()):
+    def next_line(self, line):
         """Node line evaluation function called recursively."""
-        if isinstance(node, ast.If) and node.orelse == []:
-            seg_list.append(node)
+        if isinstance(line, ast.If) and line.orelse == []:
+            self.sort_algo(line)
+            self.next_line(line.body[0])
 
-            self.next_line(node.body[0], seg_list)
-            # TODO: return the list of error node lines
-
-    def sort_algo(self, start_list, end_list):
-        # Note: start_list  -> input list of unordered error node lines
-        # Note: end_list    -> returned list of sorted/optimized node lines
-        for line in start_list:
-            if len(line.body[0].test.ops) > 1:
-                end_list.append(line)
-            else:
-                # TODO:
-                # include "isinstance" handling -> ast.Call
-                # include "True/False" handling -> ast.NameConstant
-                # include variable handling     -> ast.Name
-                pass
-                # TODO: various function call operations here
-
-    def find_vars(self, input_line, side_choice):
-        if side_choice == "left":
-            eval_value = input_line.body[0].test.left
-        elif side_choice == "comp":
-            eval_value = input_line.body[0].test.comparators[0]
-
-        if isinstance(eval_value, ast.Name):
+    def sort_algo(self, input_line):
+        if len(input_line.body[0].test.ops) > 1:
             pass
-            # TODO: call sorter function
-        elif isinstance(eval_value, ast.BinOp):
-            find_binop(eval_value, bin_choice="left")
+        elif isinstance(input_line.body[0].test, ast.Call):
+            pass
+        elif isinstance(input_line.body[0].test, ast.NameConstant):
+            pass
+        elif isinstance(input_line.body[0].test, ast.Name):
+            pass
         else:
-            find_vars(input_line, side_choice="comp")
+            pass
 
-    def find_binop(self, input_value, bin_choice):
-        if bin_choice == "left":
-            bin_value = input_value.left
-        elif bin_choice == "right":
-            bin_value = input_value.right
-
-        if isinstance(bin_value, ast.Name):
-            sorter(found_in="binop")
-        elif isinstance(bin_value, ast.BinOp):
-            find_binop(bin_value, bin_choice="left")
+    def eval_left(self, left):
+        left = left.body[0].test.left
+        if isinstance(left, ast.Name):
+            pass
+        elif isinstance(left, ast.BinOp):
+            pass
         else:
-            find_binop(input_value, bin_choice="right")
+            pass
 
-    def sorter(self, found_in):
-        if found_in == "left":
-            pass
-        elif found_in == "binop":
-            pass
-        elif found_in == "comp":
-            pass
+    def eval_oper(self, oper):
+        oper = oper.body[0].test.ops[0]
+
+    def eval_comp(self, comp):
+        comp = comp.body[0].test.comparators[0]
+
+    def eval_binop(self, binop):
+        pass
+
+
+
+#    def find_vars(self, input_line, side_choice, collector=list()):
+#        if side_choice == "left":
+#            eval_value = input_line.body[0].test.left
+#        elif side_choice == "comp":
+#            eval_value = input_line.body[0].test.comparators[0]
+
+#        if isinstance(eval_value, ast.Name):
+#            pass
+#            # TODO: call sorter function
+#        elif isinstance(eval_value, ast.BinOp):
+#            find_binop(eval_value, bin_choice="left")
+#        else:
+#            find_vars(input_line, side_choice="comp")
+
+#    def find_binop(self, input_value, bin_choice):
+#        if bin_choice == "left":
+#            bin_value = input_value.left
+#        elif bin_choice == "right":
+#            bin_value = input_value.right
+
+#        if isinstance(bin_value, ast.Name):
+#            sorter(found_in="binop")
+#        elif isinstance(bin_value, ast.BinOp):
+#            find_binop(bin_value, bin_choice="left")
+#        else:
+#            find_binop(input_value, bin_choice="right")
+
+#    def sorter(self, found_in):
+#        if found_in == "left":
+#            pass
+#        elif found_in == "binop":
+#            pass
+#        elif found_in == "comp":
+#            pass
 
     # TODO: needed functions:
     # find variables        -> takes the left side of error line
