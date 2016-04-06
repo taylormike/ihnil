@@ -100,7 +100,7 @@ class WriteIHNIL(ast.NodeVisitor):
                 # TODO:
                 # include "isinstance" handling -> ast.Call
                 # include "True/False" handling -> ast.NameConstant
-                # include variable handline     -> ast.Name
+                # include variable handling     -> ast.Name
                 pass
                 # TODO: various function call operations here
 
