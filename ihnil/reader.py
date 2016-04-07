@@ -12,8 +12,8 @@ import codegen
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
-                                 epilog="For details see " \
-                                         "https://github.com/forstmeier/ihnil")
+                                 epilog="For details see "
+                                 "https://github.com/forstmeier/ihnil")
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),
@@ -30,19 +30,6 @@ output.add_argument("-w", "--write",
 args = parser.parse_args()
 string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
-
-
-additive = ["Add()", "Sub()"]
-productive = ["Mult()", "Div()"]
-others = ["FloorDiv()", "Mod", "Pow()"]
-binops = [additive, productive, others]
-
-strict = ["Gt()", "Lt()"]
-loose = ["GtE()", "LtE()"]
-equal = ["Eq()", "NotEq()"]
-identity = ["Is()", "IsNot()"]
-inclusion = ["In()", "NotIn()"]
-operators = [strict, loose, equal, identity, inclusion]
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -126,30 +113,28 @@ class WriteIHNIL(ast.NodeVisitor):
         # Note: ^ argument input -> left.body[0].test
         if isinstance(line.left, ast.Name):
             store_l = store
-            store_l.append(line.op)  # TODO: insert operator swap function
+            op = self.oper_swap(line.op)
+            store_l.append(op)
             store_l.append(line.right)
         elif isinstance(line.left, ast.BinOp):
             pass
 
         if isinstance(line.right, ast.Name):
             store_r = store
-            store_r.append(line.op)  # TODO: insert operator swap function
+            op = self.oper_swap(line.op)
+            store_r.append(op)
             store_r.append(line.left)
         elif isinstance(line.right, ast.BinOp):
             pass
 
-
-
-        bin_left = line.left
-        bin_oper = line.op
-        bin_right = line.right
-
-
-
-
-
-
-
+    def oper_swap(self, oper):
+        OPER_MAP = {"Add()": "-", "Sub()": "+", "Mult()": "/", "Div()": "*",
+                    "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
+                    "Gt()": "Lt()", "Lt()": "Gt()", "GtE()": "LtE()",
+                    "LtE()": "GtE()", "Eq()": "NotEq()", "NotEq()": "Eq()",
+                    "Is()": "IsNot()", "IsNot()": "Is()", "In()": "NotIn()",
+                    "NotIn()": "In()"}
+        return OPER_MAP[oper]
 
 
 # TODO: idea 1:
@@ -208,7 +193,7 @@ class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
-            print("[> Nested 'if' number {} start " \
+            print("[> Nested 'if' number {} start "
                   "line {}".format(self.count, node.lineno))
             self._end_line(node, self.count)
             self.count += 1
@@ -219,7 +204,7 @@ class ElseIHNIL(ast.NodeVisitor):
             self.endno = node.lineno
             self._end_line(node.body[0], count)
         else:
-            print("[> Nested 'if' number {} end " \
+            print("[> Nested 'if' number {} end "
                   "line {}".format(count, self.endno))
 
 
