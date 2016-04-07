@@ -12,8 +12,8 @@ import codegen
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
-                                 epilog="For details see \
-                                         https://github.com/forstmeier/ihnil")
+                                 epilog="For details see " \
+                                         "https://github.com/forstmeier/ihnil")
 
 parser.add_argument("file_name",
                     type=argparse.FileType(),
@@ -32,14 +32,16 @@ string_name = str(args.file_name.name)
 file_extension = os.path.splitext(string_name)[1]
 
 
-binops = ["Add()", "Sub()", "Mult()", "Div()", "FloorDiv()", "Mod", "Pow()"]
+additive = ["Add()", "Sub()"]
+productive = ["Mult()", "Div()"]
+others = ["FloorDiv()", "Mod", "Pow()"]
+binops = [additive, productive, others]
 
 strict = ["Gt()", "Lt()"]
 loose = ["GtE()", "LtE()"]
 equal = ["Eq()", "NotEq()"]
 identity = ["Is()", "IsNot()"]
 inclusion = ["In()", "NotIn()"]
-
 operators = [strict, loose, equal, identity, inclusion]
 
 
@@ -98,68 +100,57 @@ class WriteIHNIL(ast.NodeVisitor):
         elif isinstance(input_line.body[0].test, ast.Name):
             pass
         else:
-            pass
+            pass  # function calls go here
 
-    def eval_left(self, left):
-        left = left.body[0].test.left
+    def eval_left(self, line, store=list()):
+        # Note: ^ argument input -> left.body[0].test
+        left = line.left
         if isinstance(left, ast.Name):
-            pass
+            # self.eval_oper(left)
+            store.insert(0, line.body[0].test.comparators[0])
+            store.insert(0, line.body[0].test.ops[0])
+            store.insert(0, left.id)
         elif isinstance(left, ast.BinOp):
-            pass
+            self.eval_binop(line, store)
         else:
             pass
 
-    def eval_oper(self, oper):
-        oper = oper.body[0].test.ops[0]
+    def eval_oper(self, line):  # decomission -> not likely needed
+        oper = line.body[0].test.ops[0]
+        return oper
 
-    def eval_comp(self, comp):
-        comp = comp.body[0].test.comparators[0]
+    def eval_comp(self, line):  # only called on eval_left -> else
+        comp = line.body[0].test.comparators[0]
 
-    def eval_binop(self, binop):
-        pass
+    def eval_binop(self, line, store):
+        # Note: ^ argument input -> left.body[0].test
+        if isinstance(line.left, ast.Name):
+            store_l = store
+            store_l.append(line.op)  # TODO: insert operator swap function
+            store_l.append(line.right)
+        elif isinstance(line.left, ast.BinOp):
+            pass
+
+        if isinstance(line.right, ast.Name):
+            store_r = store
+            store_r.append(line.op)  # TODO: insert operator swap function
+            store_r.append(line.left)
+        elif isinstance(line.right, ast.BinOp):
+            pass
 
 
 
-#    def find_vars(self, input_line, side_choice, collector=list()):
-#        if side_choice == "left":
-#            eval_value = input_line.body[0].test.left
-#        elif side_choice == "comp":
-#            eval_value = input_line.body[0].test.comparators[0]
+        bin_left = line.left
+        bin_oper = line.op
+        bin_right = line.right
 
-#        if isinstance(eval_value, ast.Name):
-#            pass
-#            # TODO: call sorter function
-#        elif isinstance(eval_value, ast.BinOp):
-#            find_binop(eval_value, bin_choice="left")
-#        else:
-#            find_vars(input_line, side_choice="comp")
 
-#    def find_binop(self, input_value, bin_choice):
-#        if bin_choice == "left":
-#            bin_value = input_value.left
-#        elif bin_choice == "right":
-#            bin_value = input_value.right
 
-#        if isinstance(bin_value, ast.Name):
-#            sorter(found_in="binop")
-#        elif isinstance(bin_value, ast.BinOp):
-#            find_binop(bin_value, bin_choice="left")
-#        else:
-#            find_binop(input_value, bin_choice="right")
 
-#    def sorter(self, found_in):
-#        if found_in == "left":
-#            pass
-#        elif found_in == "binop":
-#            pass
-#        elif found_in == "comp":
-#            pass
 
-    # TODO: needed functions:
-    # find variables        -> takes the left side of error line
-    # parse binops          -> activated if needed
-    # parse comparators     -> activated if needed
-    # sort function         -> called following each parser
+
+
+
 
 # TODO: idea 1:
 #
@@ -217,8 +208,8 @@ class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
-            print("[> Nested 'if' number {} start \
-                  line {}".format(self.count, node.lineno))
+            print("[> Nested 'if' number {} start " \
+                  "line {}".format(self.count, node.lineno))
             self._end_line(node, self.count)
             self.count += 1
 
@@ -228,8 +219,8 @@ class ElseIHNIL(ast.NodeVisitor):
             self.endno = node.lineno
             self._end_line(node.body[0], count)
         else:
-            print("[> Nested 'if' number {} end \
-                  line {}".format(count, self.endno))
+            print("[> Nested 'if' number {} end " \
+                  "line {}".format(count, self.endno))
 
 
 if file_extension == ".py":
