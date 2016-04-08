@@ -78,35 +78,42 @@ class WriteIHNIL(ast.NodeVisitor):
             self.next_line(line.body[0])
 
     def sort_algo(self, input_line):
-        if len(input_line.body[0].test.ops) > 1:
+        # truncate the three below into a single option
+        if isinstance(input_line.body[0], ast.Call):
             pass
-        elif isinstance(input_line.body[0].test, ast.Call):
+        elif isinstance(input_line.body[0], ast.NameConstant):
             pass
-        elif isinstance(input_line.body[0].test, ast.NameConstant):
+        elif isinstance(input_line.body[0], ast.Name):
             pass
-        elif isinstance(input_line.body[0].test, ast.Name):
-            pass
-        else:
-            pass  # function calls go here
+        elif isinstance(input_line.body[0], ast.If):
+            if len(input_line.body[0].test.ops) > 1:
+                pass
+            else:
+                pass
+                # evaluation method calls placed here
 
     def eval_left(self, line, store=list()):
         # Note: ^ argument input -> left.body[0].test
-        left = line.left
         if isinstance(left, ast.Name):
-            # self.eval_oper(left)
             store.insert(0, line.body[0].test.comparators[0])
             store.insert(0, line.body[0].test.ops[0])
-            store.insert(0, left.id)
+            store.insert(0, line.left.id)
         elif isinstance(left, ast.BinOp):
-            self.eval_binop(line, store)
+            pass
+        else:
+            pass  # call the comparator evaluation
+
+    def eval_comp(self, line, store=list()):
+        comp = line.comparators[0]
+        if isinstance(comp, ast.Name):
+            op = self.oper_swap(line.body[0].test.ops[0])
+            pass
+        if isinstance(comp, ast.BinOp):
+            pass
         else:
             pass
-
-    def eval_oper(self, line):  # decomission -> not likely needed
-        oper = line.body[0].test.ops[0]
-        return oper
-
-    def eval_comp(self, line):  # only called on eval_left -> else
+        # only invoked as it is brought up in the line traversal
+        # flipping operators will be necessary in this method
         comp = line.body[0].test.comparators[0]
 
     def eval_binop(self, line, store):
@@ -128,12 +135,14 @@ class WriteIHNIL(ast.NodeVisitor):
             pass
 
     def oper_swap(self, oper):
-        OPER_MAP = {"Add()": "-", "Sub()": "+", "Mult()": "/", "Div()": "*",
+        OPER_MAP = {"Add()": "-", "Sub()": "+",
+                    "Mult()": "/", "Div()": "*",
                     "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
-                    "Gt()": "Lt()", "Lt()": "Gt()", "GtE()": "LtE()",
-                    "LtE()": "GtE()", "Eq()": "NotEq()", "NotEq()": "Eq()",
-                    "Is()": "IsNot()", "IsNot()": "Is()", "In()": "NotIn()",
-                    "NotIn()": "In()"}
+                    "Gt()": "Lt()", "Lt()": "Gt()",
+                    "GtE()": "LtE()", "LtE()": "GtE()",
+                    "Eq()": "NotEq()", "NotEq()": "Eq()",
+                    "Is()": "IsNot()", "IsNot()": "Is()",
+                    "In()": "NotIn()", "NotIn()": "In()"}
         return OPER_MAP[oper]
 
 
