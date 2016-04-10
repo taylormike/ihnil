@@ -93,8 +93,8 @@ class WriteIHNIL(ast.NodeVisitor):
                 # evaluation method calls placed here
 
     def eval_left(self, line, store=list()):
-        # Note: ^ argument input -> left.body[0].test
-        if isinstance(left, ast.Name):
+        # Note: ^ argument input -> input_line.body[0].test
+        if isinstance(line.left, ast.Name):  # <- error; needs to be general
             store.insert(0, line.body[0].test.comparators[0])
             store.insert(0, line.body[0].test.ops[0])
             store.insert(0, line.left.id)
