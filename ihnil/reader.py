@@ -90,49 +90,28 @@ class WriteIHNIL(ast.NodeVisitor):
                 pass
             else:
                 pass
-                # evaluation method calls placed here
+                # self.eval_left(input_line.body[0].test)
 
     def eval_left(self, line, store=list()):
-        # Note: ^ argument input -> input_line.body[0].test
-        if isinstance(line.left, ast.Name):  # <- error; needs to be general
-            store.insert(0, line.body[0].test.comparators[0])
-            store.insert(0, line.body[0].test.ops[0])
+        store.insert(0, line.comparators[0])
+        store.insert(0, line.ops[0])
+        if isinstance(line.left, ast.Name):
             store.insert(0, line.left.id)
-        elif isinstance(left, ast.BinOp):
+        elif isinstance(line, ast.BinOp):
             pass
         else:
-            pass  # call the comparator evaluation
+            pass
 
     def eval_comp(self, line, store=list()):
-        comp = line.comparators[0]
-        if isinstance(comp, ast.Name):
-            op = self.oper_swap(line.body[0].test.ops[0])
+        if isinstance(line, ast.Name):
             pass
-        if isinstance(comp, ast.BinOp):
+        elif isinstance(line, ast.BinOp):
             pass
         else:
             pass
-        # only invoked as it is brought up in the line traversal
-        # flipping operators will be necessary in this method
-        comp = line.body[0].test.comparators[0]
 
     def eval_binop(self, line, store):
-        # Note: ^ argument input -> left.body[0].test
-        if isinstance(line.left, ast.Name):
-            store_l = store
-            op = self.oper_swap(line.op)
-            store_l.append(op)
-            store_l.append(line.right)
-        elif isinstance(line.left, ast.BinOp):
-            pass
-
-        if isinstance(line.right, ast.Name):
-            store_r = store
-            op = self.oper_swap(line.op)
-            store_r.append(op)
-            store_r.append(line.left)
-        elif isinstance(line.right, ast.BinOp):
-            pass
+        pass
 
     def oper_swap(self, oper):
         OPER_MAP = {"Add()": "-", "Sub()": "+",
