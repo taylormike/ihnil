@@ -78,12 +78,8 @@ class WriteIHNIL(ast.NodeVisitor):
             self.next_line(line.body[0])
 
     def sort_algo(self, input_line):
-        # truncate the three below into a single option
-        if isinstance(input_line.body[0], ast.Call):
-            pass
-        elif isinstance(input_line.body[0], ast.NameConstant):
-            pass
-        elif isinstance(input_line.body[0], ast.Name):
+        if isinstance(input_line.body[0], (ast.Call,
+                                           ast.NameConstant, ast.Name)):
             pass
         elif isinstance(input_line.body[0], ast.If):
             if len(input_line.body[0].test.ops) > 1:
@@ -91,27 +87,50 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 pass
                 # self.eval_left(input_line.body[0].test)
+                # ^ the returned values from this are added to "holder list"
+                # ^ this is for each "input_line"
+                # ^ the "holder list" is then compared iteratively to
+                # ^ -> "final list"
 
     def eval_left(self, line, store=list()):
         store.insert(0, line.comparators[0])
         store.insert(0, line.ops[0])
         if isinstance(line.left, ast.Name):
             store.insert(0, line.left.id)
+            # return store
         elif isinstance(line, ast.BinOp):
-            pass
+            self.eval_binop(line.left)
         else:
             pass
 
     def eval_comp(self, line, store=list()):
+        store.insert(0, line.left)
+        store.insert(0, line.ops[0])
         if isinstance(line, ast.Name):
-            pass
+            store.insert(0, line.comparators[0].id)
+            # return store
         elif isinstance(line, ast.BinOp):
             pass
         else:
             pass
 
     def eval_binop(self, line, store):
-        pass
+        if isinstance(line.left, ast.Name):
+            op = self.oper_swap(line.op)
+            store.append(op)
+            store.append(line.right)
+            # return store
+        elif isinstance(line.left, ast.BinOp):
+            op = self.oper_swap(line.op)
+            store.append(op)
+            store.append(line.right)
+            self.eval_binop(line.left)
+
+        if isinstance(line.right, ast.Name):
+            op = self.oper_swap(line.op)
+            store.append(op)
+            store.append(line.left)
+            # return store
 
     def oper_swap(self, oper):
         OPER_MAP = {"Add()": "-", "Sub()": "+",
@@ -123,37 +142,6 @@ class WriteIHNIL(ast.NodeVisitor):
                     "Is()": "IsNot()", "IsNot()": "Is()",
                     "In()": "NotIn()", "NotIn()": "In()"}
         return OPER_MAP[oper]
-
-
-# TODO: idea 1:
-#
-# definitions:
-# error node        -> group of nested if statements
-# error lineno      -> each individual if statement line
-# fixed list        -> collection of temporarily optimized lines
-# holder list       -> temporary holder for unmatched optimized lines
-#
-# structure:
-# look at each error line of the error node
-# check if there is one than more comparator operator in the error line
-# ^ if there is then append the error node to the fixed list
-# ^ else run the full parsing operation
-# if the fixed list is empty
-# ^ if there is only one optimized (one variable) line
-# ^ ^ add the optimized line to the fixed list
-# ^ else add all possible optimizations (multiple variables) to a holder list
-# ^ add the holder list to the fixed list
-# else if the fixed list is not empty
-# ^ compare each possible optimized alternative (one/more variables)
-# ^ to each of the items within fixed list
-# ^ ^ if the item in fixed list is a holder list
-# ^ ^ ^ compare each of the optimzed alternatives to each holder list item
-# ^ ^ if the comparision fits 1. variable and 2. operator family
-# ^ ^ ^ merge the two lines together
-# ^ ^ ^ if the compared item was in a holder list
-# ^ ^ ^ ^ delete the holder list
-# ^ ^ ^ delete all optimized alternatives for the current error line
-# return a fully optimzied list
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
