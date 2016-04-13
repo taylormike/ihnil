@@ -2,7 +2,6 @@
 IHNIL main parsing module.
 
 Provides the interface for evaluating a given target file
-
 """
 
 import argparse
@@ -80,13 +79,15 @@ class WriteIHNIL(ast.NodeVisitor):
     def sort_algo(self, input_line):
         if isinstance(input_line.body[0], (ast.Call,
                                            ast.NameConstant, ast.Name)):
+            # yield input_line
             pass
         elif isinstance(input_line.body[0], ast.If):
             if len(input_line.body[0].test.ops) > 1:
+                # yield input_line
                 pass
             else:
-                pass
                 # self.eval_left(input_line.body[0].test)
+                pass
                 # ^ the returned values from this are added to "holder list"
                 # ^ this is for each "input_line"
                 # ^ the "holder list" is then compared iteratively to
@@ -97,40 +98,36 @@ class WriteIHNIL(ast.NodeVisitor):
         store.insert(0, line.ops[0])
         if isinstance(line.left, ast.Name):
             store.insert(0, line.left.id)
-            # return store
+            # yield store
         elif isinstance(line, ast.BinOp):
-            self.eval_binop(line.left)
-        else:
-            pass
+            self.eval_binop(line.left, store)
 
     def eval_comp(self, line, store=list()):
         store.insert(0, line.left)
         store.insert(0, line.ops[0])
         if isinstance(line, ast.Name):
             store.insert(0, line.comparators[0].id)
-            # return store
+            # yield store
         elif isinstance(line, ast.BinOp):
-            pass
-        else:
-            pass
+            self.eval_binop(line.left, store)
 
     def eval_binop(self, line, store):
         if isinstance(line.left, ast.Name):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.right)
-            # return store
+            # yield store
         elif isinstance(line.left, ast.BinOp):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.right)
-            self.eval_binop(line.left)
+            self.eval_binop(line.left, store)
 
         if isinstance(line.right, ast.Name):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.left)
-            # return store
+            # yield store
 
     def oper_swap(self, oper):
         OPER_MAP = {"Add()": "-", "Sub()": "+",
@@ -171,14 +168,14 @@ class ElseIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' number {} start "
                   "line {}".format(self.count, node.lineno))
-            self._end_line(node, self.count)
+            self.end_line(node, self.count)
             self.count += 1
 
-    def _end_line(self, node, count):
+    def end_line(self, node, count):
         """Private recursive method to loop down to the last node line."""
         if isinstance(node, ast.If):
             self.endno = node.lineno
-            self._end_line(node.body[0], count)
+            self.end_line(node.body[0], count)
         else:
             print("[> Nested 'if' number {} end "
                   "line {}".format(count, self.endno))
