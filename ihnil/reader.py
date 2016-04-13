@@ -76,58 +76,57 @@ class WriteIHNIL(ast.NodeVisitor):
             self.sort_algo(line)
             self.next_line(line.body[0])
 
-    def sort_algo(self, input_line):
+    def sort_algo(self, input_line, holder=list()):
         if isinstance(input_line.body[0], (ast.Call,
                                            ast.NameConstant, ast.Name)):
-            # yield input_line
-            pass
+            holder.append(input_line)
         elif isinstance(input_line.body[0], ast.If):
             if len(input_line.body[0].test.ops) > 1:
-                # yield input_line
-                pass
+                holder.append(input_line)
             else:
-                # self.eval_left(input_line.body[0].test)
-                pass
-                # ^ the returned values from this are added to "holder list"
-                # ^ this is for each "input_line"
-                # ^ the "holder list" is then compared iteratively to
-                # ^ -> "final list"
+                self.eval_left(input_line.body[0].test, holder)
+                self.eval_comp(input_line.body[0].test, holder)
+        return holder
 
-    def eval_left(self, line, store=list()):
+    def eval_left(self, line, holder, store=list()):
         store.insert(0, line.comparators[0])
         store.insert(0, line.ops[0])
         if isinstance(line.left, ast.Name):
             store.insert(0, line.left.id)
-            # yield store
+            holder.append(store)
+            yield holder
         elif isinstance(line, ast.BinOp):
-            self.eval_binop(line.left, store)
+            self.eval_binop(line.left, holder, store)
 
-    def eval_comp(self, line, store=list()):
+    def eval_comp(self, line, holder, store=list()):
         store.insert(0, line.left)
         store.insert(0, line.ops[0])
         if isinstance(line, ast.Name):
             store.insert(0, line.comparators[0].id)
-            # yield store
+            holder.append(store)
+            yield holder
         elif isinstance(line, ast.BinOp):
-            self.eval_binop(line.left, store)
+            self.eval_binop(line.left, holder, store)
 
-    def eval_binop(self, line, store):
+    def eval_binop(self, line, holder, store):
         if isinstance(line.left, ast.Name):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.right)
-            # yield store
+            holder.append(store)
+            yield holder
         elif isinstance(line.left, ast.BinOp):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.right)
-            self.eval_binop(line.left, store)
+            self.eval_binop(line.left, holder, store)
 
         if isinstance(line.right, ast.Name):
             op = self.oper_swap(line.op)
             store.append(op)
             store.append(line.left)
-            # yield store
+            holder.append(store)
+            yield holder
 
     def oper_swap(self, oper):
         OPER_MAP = {"Add()": "-", "Sub()": "+",
@@ -142,19 +141,14 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
-        # TODO: identify and remove error loops from module
-        # TODO: take associated optimized loop and print into module
         pass
 
     def _edit_manually(self):
         """Private method to allow for manual code adjustments."""
-        # TODO: mark off error loops in module
         pass
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
-        # TODO: take down error code line information
-        # TODO: print into a separate file that holds data
         pass
 
 
