@@ -74,7 +74,6 @@ class WriteIHNIL(ast.NodeVisitor):
         """Node line evaluation function called recursively."""
         if isinstance(line, ast.If) and line.orelse == []:
 
-            print("LINE")
             self.sort_algo(line)
 
             self.next_line(line.body[0])
@@ -82,12 +81,12 @@ class WriteIHNIL(ast.NodeVisitor):
     def sort_algo(self, input_line):
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
-                print("COMPLEX")
+                return input_line
             else:
-                print("FIXER")
                 self.eval_left(input_line)
+                self.eval_comp(input_line)
         else:
-            print("SINGLE")
+            return input_line
 
     def eval_left(self, line, store=list()):
         store.insert(0, line.test.comparators[0])
@@ -97,15 +96,13 @@ class WriteIHNIL(ast.NodeVisitor):
         elif isinstance(line.test.left, ast.BinOp):
             self.eval_binop(line.test.left, store)
 
-    # def eval_comp(self, line, holder, store=list()):
-    #     store.insert(0, line.left)
-    #     store.insert(0, line.ops[0])
-    #     if isinstance(line, ast.Name):
-    #         store.insert(0, line.comparators[0].id)
-    #         holder.append(store)
-    #         return holder
-    #     elif isinstance(line, ast.BinOp):
-    #         self.eval_binop(line.left, holder, store)
+    def eval_comp(self, line, store=list()):
+        store.insert(0, line.test.left)
+        store.insert(0, line.test.ops[0])
+        if isinstance(line.test.comparators[0], ast.Name):
+            store.insert(0, line.test.comparators[0].id)
+        elif isinstance(line.test.left, ast.BinOp):
+            self.eval_binop(line.test.left, store)
 
     def eval_binop(self, line, store):
         if isinstance(line.left, ast.Name):
@@ -134,17 +131,25 @@ class WriteIHNIL(ast.NodeVisitor):
                      "In()": "NotIn()", "NotIn()": "In()"}
         return OPER_DICT[oper]
 
-    # def _accept_change(self):
-    #     """Private method to automatically apply optimized code."""
-    #     pass
-    #
-    # def _edit_manually(self):
-    #     """Private method to allow for manual code adjustments."""
-    #     pass
-    #
-    # def _mark_complete(self):
-    #     """Private method to mark and ignore non-optimized code."""
-    #     pass
+    # TODO: complete holder list building functionality
+
+    # TODO:
+    # function -> line builder for static if statements
+    # function -> complete line builder
+    # function -> parse apart adjusted if statement chunks
+    # function -> comparison & merge algorithm
+
+    def _accept_change(self):
+        """Private method to automatically apply optimized code."""
+        pass
+
+    def _edit_manually(self):
+        """Private method to allow for manual code adjustments."""
+        pass
+
+    def _mark_complete(self):
+        """Private method to mark and ignore non-optimized code."""
+        pass
 
 
 class ElseIHNIL(ast.NodeVisitor):
