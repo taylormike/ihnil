@@ -28,7 +28,7 @@ class Basic():
     """This is the Basic docstring"""
     def __init__(self, val):
         self.val = val
-    
+
     # Here is another comment
     def printr(self):
         print("The input value is " + str(self.val))
