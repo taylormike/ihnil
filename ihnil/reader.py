@@ -74,7 +74,7 @@ class WriteIHNIL(ast.NodeVisitor):
         """Node line evaluation function called recursively."""
         if isinstance(line, ast.If) and line.orelse == []:
 
-            self.sort_algo(line)
+            print(self.sort_algo(line))
 
             self.next_line(line.body[0])
 
@@ -83,42 +83,47 @@ class WriteIHNIL(ast.NodeVisitor):
             if len(input_line.test.ops) > 1:
                 return input_line
             else:
-                self.eval_left(input_line)
-                self.eval_comp(input_line)
+                return self.eval_left(input_line)
+                return self.eval_comp(input_line)
         else:
             return input_line
 
-    def eval_left(self, line, store=list()):
+    def eval_left(self, line):
+        store = list()
         store.insert(0, line.test.comparators[0])
         store.insert(0, line.test.ops[0])
         if isinstance(line.test.left, ast.Name):
             store.insert(0, line.test.left.id)
+            return store
         elif isinstance(line.test.left, ast.BinOp):
-            self.eval_binop(line.test.left, store)
+            return self.eval_binop(line.test.left, store)
 
-    def eval_comp(self, line, store=list()):
+    def eval_comp(self, line):
         store.insert(0, line.test.left)
         store.insert(0, line.test.ops[0])
         if isinstance(line.test.comparators[0], ast.Name):
             store.insert(0, line.test.comparators[0].id)
+            return store
         elif isinstance(line.test.left, ast.BinOp):
-            self.eval_binop(line.test.left, store)
+            return self.eval_binop(line.test.left, store)
 
     def eval_binop(self, line, store):
         if isinstance(line.left, ast.Name):
             op = self.oper_swap(ast.dump(line.op))
             store.append(op)
             store.append(line.right)
+            return store
         elif isinstance(line.left, ast.BinOp):
             op = self.oper_swap(ast.dump(line.op))
             store.append(op)
             store.append(line.right)
-            self.eval_binop(line.left, store)
+            return self.eval_binop(line.left, store)
 
         if isinstance(line.right, ast.Name):
             op = self.oper_swap(ast.dump(line.op))
             store.append(op)
             store.append(line.left)
+            return store
 
     def oper_swap(self, oper):
         OPER_DICT = {"Add()": "-", "Sub()": "+",
@@ -133,11 +138,10 @@ class WriteIHNIL(ast.NodeVisitor):
 
     # TODO: complete holder list building functionality
 
-    # TODO:
-    # function -> line builder for static if statements
-    # function -> complete line builder
-    # function -> parse apart adjusted if statement chunks
-    # function -> comparison & merge algorithm
+    # TODO: function -> line builder for static if statements
+    # TODO: function -> complete line builder
+    # TODO: function -> parse apart adjusted if statement chunks
+    # TODO: function -> comparison & merge algorithm
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
