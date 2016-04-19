@@ -79,17 +79,18 @@ class WriteIHNIL(ast.NodeVisitor):
             self.next_line(line.body[0])
 
     def sort_algo(self, input_line):
+        holder = list()
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
-                return input_line
+                holder.append(input_line)
             else:
-                return self.eval_left(input_line)
-                return self.eval_comp(input_line)
+                self.eval_left(input_line, holder)
+                self.eval_comp(input_line, holder)
         else:
-            return input_line
+            holder.append(input_line)
+        return holder
 
-    def eval_left(self, line):
-        store = list()
+    def eval_left(self, line, store):
         store.insert(0, line.test.comparators[0])
         store.insert(0, line.test.ops[0])
         if isinstance(line.test.left, ast.Name):
@@ -98,7 +99,8 @@ class WriteIHNIL(ast.NodeVisitor):
         elif isinstance(line.test.left, ast.BinOp):
             return self.eval_binop(line.test.left, store)
 
-    def eval_comp(self, line):
+    def eval_comp(self, line, holder):
+        store = list()
         store.insert(0, line.test.left)
         store.insert(0, line.test.ops[0])
         if isinstance(line.test.comparators[0], ast.Name):
