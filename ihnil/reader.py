@@ -8,6 +8,7 @@ import argparse
 import os
 import ast
 import codegen
+import copy
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
@@ -79,53 +80,45 @@ class WriteIHNIL(ast.NodeVisitor):
             self.next_line(line.body[0])
 
     def sort_algo(self, input_line):
-        holder = list()
+        line_holder = list()
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
-                holder.append(input_line)
+                line_holder.append(input_line)
             else:
-                self.eval_left(input_line, holder)
-                self.eval_comp(input_line, holder)
+                self.eval_left(input_line, line_holder)
         else:
-            holder.append(input_line)
-        return holder
+            line_holder.append(input_line)
+        return line_holder  # stores all lines & line alternative collections
 
-    def eval_left(self, line, store):
-        store.insert(0, line.test.comparators[0])
-        store.insert(0, line.test.ops[0])
-        if isinstance(line.test.left, ast.Name):
-            store.insert(0, line.test.left.id)
-            return store
-        elif isinstance(line.test.left, ast.BinOp):
-            return self.eval_binop(line.test.left, store)
+    def eval_left(self, input_line, line_holder):
+        alt_holder = list()
+        alt_holder.append(input_line.test.ops[0])
+        alt_holder.append(input_line.test.comparators[0])
+        if isinstance(input_line.test.left, ast.Name):
+            alt_holder.insert(0, input_line.test.left.id)
+            line_holder.append(alt_holder)
+        elif isinstance(input_line.test.left, ast.BinOp):
+            self.eval_binop(input_line.test.left, alt_holder, line_holder)
+        return line_holder
 
-    def eval_comp(self, line, holder):
-        store = list()
-        store.insert(0, line.test.left)
-        store.insert(0, line.test.ops[0])
-        if isinstance(line.test.comparators[0], ast.Name):
-            store.insert(0, line.test.comparators[0].id)
-            return store
-        elif isinstance(line.test.left, ast.BinOp):
-            return self.eval_binop(line.test.left, store)
+    def eval_binop(self, input_line, alt_holder, line_holder):
+        if isinstance(input_line.left, ast.Name):
+            left_holder = copy.copy(alt_holder)
+            left_holder.append(self.oper_swap(ast.dump(input_line.op)))
+            left_holder.append(input_line.right)
+            left_holder.insert(0, input_line.left.id)
+            line_holder.append(left_holder)
+            del(left_holder)
+        elif isinstance(input_line.left, ast.BinOp):
+            self.eval_binop(input_line.left, left_holder, line_holder)
+        if isinstance(input_line.right, ast.Name):
+            right_holder = copy.copy(alt_holder)
+            right_holder.append(self.oper_swap(ast.dump(input_line.op)))
+            right_holder.append(input_line.left)
+            right_holder.insert(0, input_line.right.id)
+            line_holder.append(right_holder)
+            del(right_holder)
 
-    def eval_binop(self, line, store):
-        if isinstance(line.left, ast.Name):
-            op = self.oper_swap(ast.dump(line.op))
-            store.append(op)
-            store.append(line.right)
-            return store
-        elif isinstance(line.left, ast.BinOp):
-            op = self.oper_swap(ast.dump(line.op))
-            store.append(op)
-            store.append(line.right)
-            return self.eval_binop(line.left, store)
-
-        if isinstance(line.right, ast.Name):
-            op = self.oper_swap(ast.dump(line.op))
-            store.append(op)
-            store.append(line.left)
-            return store
 
     def oper_swap(self, oper):
         OPER_DICT = {"Add()": "-", "Sub()": "+",
@@ -137,13 +130,6 @@ class WriteIHNIL(ast.NodeVisitor):
                      "Is()": "IsNot()", "IsNot()": "Is()",
                      "In()": "NotIn()", "NotIn()": "In()"}
         return OPER_DICT[oper]
-
-    # TODO: complete holder list building functionality
-
-    # TODO: function -> line builder for static if statements
-    # TODO: function -> complete line builder
-    # TODO: function -> parse apart adjusted if statement chunks
-    # TODO: function -> comparison & merge algorithm
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
