@@ -6,9 +6,10 @@ Source-to-source AST transformation and optimization.
 
 Prounced: "eye-nil" For use on Python code modules. :snake:  
 
-I hate nested "if" loops. They're ugly, they're slow, they've got to go. 
+I hate nested "if" loops. They're ugly, they're slow, they've got to go.
 While there are *some* instances where they are necessary, let's see if we  
-can get rid of all of the useless ones. 
+can get rid of all of the useless ones.
+
 This is an attempt to balance between **readability** and **optimization** all  
 within Pythonic principles of code.  
 
@@ -29,6 +30,7 @@ Currently only available for Python 3.
 - [os](https://docs.python.org/3.4/library/os.html#module-os)
 - [ast](https://docs.python.org/3.4/library/ast.html)
 - [codegen](https://github.com/andreif/codegen)
+- [copy](https://docs.python.org/3.4/library/copy.html)
 
 ## Contribution
 

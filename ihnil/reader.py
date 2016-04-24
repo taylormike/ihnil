@@ -8,7 +8,7 @@ import argparse
 import os
 import ast
 import codegen
-import copy
+# import copy
 
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
@@ -83,53 +83,129 @@ class WriteIHNIL(ast.NodeVisitor):
         line_holder = list()
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
-                line_holder.append(input_line)
+                line_holder.append([input_line])
             else:
                 self.eval_left(input_line, line_holder)
+                self.eval_comp(input_line, line_holder)
         else:
-            line_holder.append(input_line)
-        return line_holder  # stores all lines & line alternative collections
+            line_holder.append([input_line])
+        return line_holder
 
     def eval_left(self, input_line, line_holder):
-        alt_holder = list()
-        alt_holder.append(input_line.test.ops[0])
-        alt_holder.append(input_line.test.comparators[0])
+        left_holder = list()
+        left_bin = list()
+        left_holder.append(self.oper_clean(ast.dump(input_line.test.ops[0])))
+        if isinstance(input_line.test.comparators[0], ast.BinOp):
+            for element in self.left_binop_clean(input_line.test
+                                                 .comparators[0], left_bin):
+                left_holder.append(element)
+        else:
+            left_holder.append(self.var_clean(input_line.test.comparators[0]))
         if isinstance(input_line.test.left, ast.Name):
-            alt_holder.insert(0, input_line.test.left.id)
-            line_holder.append(alt_holder)
+            left_holder.insert(0, input_line.test.left.id)
+            line_holder.append(left_holder)
         elif isinstance(input_line.test.left, ast.BinOp):
-            self.eval_binop(input_line.test.left, alt_holder, line_holder)
+            self.eval_binop(input_line.test.left, left_holder, line_holder)
+        return line_holder
+
+    def eval_comp(self, input_line, line_holder):
+        comp_holder = list()
+        comp_bin = list()
+        comp_holder.append(self.oper_swap(ast.dump(input_line.test.ops[0])))
+        if isinstance(input_line.test.left, ast.BinOp):
+            for element in self.right_binop_clean(input_line.test.left,
+                                                  comp_bin):
+                comp_holder.append(element)
+        else:
+            comp_holder.append(self.var_clean(input_line.test.left))
+        if isinstance(input_line.test.comparators[0], ast.Name):
+            comp_holder.insert(0, input_line.test.comparators[0].id)
+            line_holder.append(comp_holder)
+        elif isinstance(input_line.test.comparators[0], ast.BinOp):
+            self.eval_binop(input_line.test.comparators[0],
+                            comp_holder, line_holder)
         return line_holder
 
     def eval_binop(self, input_line, alt_holder, line_holder):
         if isinstance(input_line.left, ast.Name):
-            left_holder = copy.copy(alt_holder)
+            # left_holder = copy.copy(alt_holder)
+            left_holder = alt_holder[:]
             left_holder.append(self.oper_swap(ast.dump(input_line.op)))
-            left_holder.append(input_line.right)
+            left_holder.append(self.var_clean(input_line.right))
             left_holder.insert(0, input_line.left.id)
             line_holder.append(left_holder)
             del(left_holder)
         elif isinstance(input_line.left, ast.BinOp):
             self.eval_binop(input_line.left, left_holder, line_holder)
         if isinstance(input_line.right, ast.Name):
-            right_holder = copy.copy(alt_holder)
+            # right_holder = copy.copy(alt_holder)
+            right_holder = alt_holder[:]
             right_holder.append(self.oper_swap(ast.dump(input_line.op)))
-            right_holder.append(input_line.left)
+            right_holder.append(self.var_clean(input_line.left))
             right_holder.insert(0, input_line.right.id)
             line_holder.append(right_holder)
             del(right_holder)
 
+    # changes operators to "text" version to add to alt_holder list
+    def oper_clean(self, oper):
+        OPER_ALL = {"Add()": "+", "Sub()": "-",
+                    "Mult()": "*", "Div()": "/",
+                    "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
+                    "Gt()": ">", "Lt()": "<",
+                    "GtE()": ">=", "LtE()": "<=",
+                    "Eq()": "==", "NotEq()": "!=",
+                    "Is()": "Is", "IsNot()": "Is Not",
+                    "In()": "In", "NotIn()": "Not In"}
+        return OPER_ALL[oper]
 
+    # changes operator in binop algebraic optimizations
     def oper_swap(self, oper):
         OPER_DICT = {"Add()": "-", "Sub()": "+",
                      "Mult()": "/", "Div()": "*",
                      "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
-                     "Gt()": "Lt()", "Lt()": "Gt()",
-                     "GtE()": "LtE()", "LtE()": "GtE()",
-                     "Eq()": "NotEq()", "NotEq()": "Eq()",
-                     "Is()": "IsNot()", "IsNot()": "Is()",
-                     "In()": "NotIn()", "NotIn()": "In()"}
+                     "Gt()": "<", "Lt()": ">",
+                     "GtE()": "<=", "LtE()": ">=",
+                     "Eq()": "!=", "NotEq()": "==",
+                     "Is()": "Is Not", "IsNot()": "Is",
+                     "In()": "Not In", "NotIn()": "In"}
         return OPER_DICT[oper]
+
+    # used to evaluate single variables added to the alt_holder list
+    def var_clean(self, const):
+        if isinstance(const, ast.Num):
+            return const.n
+        elif isinstance(const, ast.Str):
+            return const.s
+        elif isinstance(const, (ast.List, ast.Set)):
+            new_list = list()
+            for element in const.elts:
+                new_list.append(self.var_clean(element))
+            return new_list
+        elif isinstance(const, ast.NameConstant):
+            return const.value
+        elif isinstance(const, ast.Name):
+            return const.id
+
+    def left_binop_clean(self, chunk, temp_list):
+        temp_list.append(self.oper_clean(ast.dump(chunk.op)))
+        temp_list.append(self.var_clean(chunk.right))
+        if isinstance(chunk.left, ast.BinOp):
+            self.left_binop_clean(chunk.left, temp_list)
+        else:
+            temp_list.insert(0, self.var_clean(chunk.left))
+        return temp_list
+
+    def right_binop_clean(self, chunk, temp_list):
+        temp_list.append(self.oper_swap(ast.dump(chunk.op)))
+        temp_list.append(self.var_clean(chunk.right))
+        if isinstance(chunk.left, ast.BinOp):
+            self.right_binop_clean(chunk.left, temp_list)
+        else:
+            temp_list.insert(0, self.var_clean(chunk.left))
+        return temp_list
+
+    def bulk_clean(self, bulk):
+        pass
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""

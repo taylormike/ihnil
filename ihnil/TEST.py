@@ -34,14 +34,14 @@ class Basic():
         print("The input value is " + str(self.val))
 
 def listif(inp, num):
-    if inp + num > 0:
-        if num % 2 == 0:
-            if 20 > inp:
-                if inp != "SPAMELOT":
-                    if inp in [1, 2, 3]:
-                        if inp != num:
-                            if num + 10 != inp + 20:
-                                if inp == (num % 2):
+    if inp + num > 0:                                   # No.1
+        if num % 2 == 0:                                # No.2
+            if 20 > inp:                                # No.3
+                if inp != "SPAMELOT":                   # No.4
+                    if inp in [1, 2, 3]:                # No.5
+                        if inp != num:                  # No.6
+                            if num + 10 != inp + 20:    # No.7
+                                if inp == (num % 2):    # No.8
                                     print(inp)
 
 def brutal(val1, val2):
