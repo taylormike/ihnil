@@ -165,9 +165,9 @@ class WriteIHNIL(ast.NodeVisitor):
                      "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
                      "Gt()": "<", "Lt()": ">",
                      "GtE()": "<=", "LtE()": ">=",
-                     "Eq()": "!=", "NotEq()": "==",
-                     "Is()": "Is Not", "IsNot()": "Is",
-                     "In()": "Not In", "NotIn()": "In"}
+                     "Eq()": "==", "NotEq()": "!=",
+                     "Is()": "Is", "IsNot()": "Is Not",
+                     "In()": "In", "NotIn()": "Not In"}
         return OPER_DICT[oper]
 
     # used to evaluate single variables added to the alt_holder list
