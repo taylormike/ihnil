@@ -182,8 +182,6 @@ class WriteIHNIL(ast.NodeVisitor):
             return const.value
         elif isinstance(const, ast.Name):
             return const.id
-        elif isinstance(const, ast.BinOp):
-            return self.bulk_bin_clean(const, list())
 
     def left_binop_clean(self, chunk, temp_list):
         temp_list.append(self.oper_clean(ast.dump(chunk.op)))
@@ -209,7 +207,11 @@ class WriteIHNIL(ast.NodeVisitor):
         bulker = zip(bulk.test.ops, bulk.test.comparators)
         for item in bulker:
             bulk_hold.append(self.oper_clean(ast.dump(item[0])))
-            bulk_hold.append(self.var_clean(item[1]))
+            if isinstance(item, ast.BinOp):
+                for piece in self.bulk_bin_clean(item, list()):
+                    bulk_hold.append(piece)
+            else:
+                bulk_hold.append(self.var_clean(item[1]))
         return bulk_hold
 
     def bulk_bin_clean(self, bulk_bin, bulk_list):
