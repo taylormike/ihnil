@@ -54,6 +54,8 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             self.next_line(node)
+            # this is where the sorting/combining method will go
+            # it will take "self.next_line(node)" as its argument
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -203,12 +205,16 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def bulk_clean(self, bulk):
         bulk_hold = list()
-        bulk_hold.append(self.var_clean(bulk.test.left))
+        if isinstance(bulk.test.left, ast.BinOp):
+            for piece in self.bulk_bin_clean(bulk.test.left, list()):
+                bulk_hold.append(piece)
+        else:
+            bulk_hold.append(self.var_clean(bulk.test.left))
         bulker = zip(bulk.test.ops, bulk.test.comparators)
         for item in bulker:
             bulk_hold.append(self.oper_clean(ast.dump(item[0])))
-            if isinstance(item, ast.BinOp):
-                for piece in self.bulk_bin_clean(item, list()):
+            if isinstance(item[1], ast.BinOp):
+                for piece in self.bulk_bin_clean(item[1], list()):
                     bulk_hold.append(piece)
             else:
                 bulk_hold.append(self.var_clean(item[1]))
@@ -223,17 +229,27 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_list.insert(0, self.var_clean(bulk_bin.left))
         return bulk_list
 
+    def compare_algo(self, comp_list):
+        thing = comp_list.pop()
+        for comp in comp_list:
+            pass
+
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
         pass
+        # this will simply add the code into the document
+        # either 1. replace completely or 2. add in surrounded with lines
 
     def _edit_manually(self):
         """Private method to allow for manual code adjustments."""
         pass
+        # this will alllow the user to edit as needed
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
         pass
+        # add the location/content of the code node to an additional
+        # external file and ignore it
 
 
 class ElseIHNIL(ast.NodeVisitor):
