@@ -18,7 +18,7 @@ within Pythonic principles of code.
 After installation, run via with the arguments below in the terminal:  
 
 ```
-python3 reader.py [ -r/--read | -w/--read ] [ -h/--help ] filename  
+python3 reader.py [ -r/--read | -w/--read ] filename  
 ```  
 
 The default argument is ` -r / --read `.  
