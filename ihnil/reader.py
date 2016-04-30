@@ -229,28 +229,21 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_list.insert(0, self.var_clean(bulk_bin.left))
         return bulk_list
 
-    def compare_algo(self, comp_list):
+    def compare_algo(self, comp_elem):
         result_list = list()
-        while len(comp_list) > 0:
-            cur_elem = comp_list.pop()
-            combo = [(x, y) for x in cur_elem for y in comp_list
-                     if x[0] == y[0]]
-
-
-
-            # if len(cur_elem) > 1 and len(comp_list) > 1:
-            #     temp_name1 = [(x, y) if x[0] == y[0]
-            #                   for x in cur_elem
-            #                   for y in comp_list]
-            # elif len(cur_elem) > 1 and len(comp_list) == 1:
-            #     temp_name2 = [(x, comp_list[0]) if x[0] == comp_list[0]
-            #                   for x in cur_elem]
-            # elif len(comp_list) > 1 and len(cur_elem) == 1:
-            #     temp_name3 = [(y, cur_elem[0]) if y[0] == cur_elem[0]
-            #                   for y in comp_list[0]]
-            # else:
-            #     if cur_elem[0] == comp_list[0]:
-            #         temp_name4 = (cur_elem[0], comp_list[0])
+        while len(comp_elem) > 0:
+            curr_elem = comp_elem.pop()
+            for ce in curr_elem:
+                for element in comp_elem:
+                    for el in element:
+                        if ce[0] == el[0] and self.oper_swap(ce[1]) == el[1]:
+                            result_list.append((ce, el))
+                            break
+                        else:
+                            result_list.append(curr_elem[0])
+                        break
+                    break
+        return result_list
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
