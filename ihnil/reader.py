@@ -53,9 +53,9 @@ class WriteIHNIL(ast.NodeVisitor):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
-            self.next_line(node)
-            # this is where the sorting/combining method will go
-            # it will take "self.next_line(node)" as its argument
+            collector = list()
+
+            print(self.next_line(node, collector))
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -72,13 +72,12 @@ class WriteIHNIL(ast.NodeVisitor):
             else:
                 print("No action taken")
 
-    def next_line(self, line):
-        """Node line evaluation function called recursively."""
+    def next_line(self, line, collector):
+        """Pull apart the error node recursively into individual lines."""
         if isinstance(line, ast.If) and line.orelse == []:
-
-            print(self.sort_algo(line))
-
-            self.next_line(line.body[0])
+            collector.append(self.sort_algo(line))
+            self.next_line(line.body[0], collector)
+        return collector
 
     def sort_algo(self, input_line):
         line_holder = list()
@@ -237,13 +236,19 @@ class WriteIHNIL(ast.NodeVisitor):
                 for element in comp_elem:
                     for el in element:
                         if ce[0] == el[0] and self.oper_swap(ce[1]) == el[1]:
-                            result_list.append((ce, el))
+                            result_list.append(self.combine_algo(ce, el))
                             break
                         else:
                             result_list.append(curr_elem[0])
                         break
                     break
         return result_list
+
+    def combine_algo(self, left_item, right_item):
+        right_item.insert(0, self.oper_swap(left_item[1]))
+        for item in left_item[2:]:
+            right_item.insert(0, item)
+        return right_item
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
