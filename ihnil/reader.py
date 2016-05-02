@@ -55,7 +55,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
             collector = list()
 
-            print(self.next_line(node, collector))
+            print(self.compare_algo(self.next_line(node, collector)))
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -148,7 +148,7 @@ class WriteIHNIL(ast.NodeVisitor):
             del(right_holder)
 
     def oper_clean(self, oper):
-        OPER_ALL = {"Add()": "+", "Sub()": "-",
+        OPER_DICT = {"Add()": "+", "Sub()": "-",
                     "Mult()": "*", "Div()": "/",
                     "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
                     "Gt()": ">", "Lt()": "<",
@@ -156,7 +156,7 @@ class WriteIHNIL(ast.NodeVisitor):
                     "Eq()": "==", "NotEq()": "!=",
                     "Is()": "Is", "IsNot()": "Is Not",
                     "In()": "In", "NotIn()": "Not In"}
-        return OPER_ALL[oper]
+        return OPER_DICT[oper]
 
     def oper_swap(self, oper):
         OPER_DICT = {"Add()": "-", "Sub()": "+",
@@ -167,6 +167,14 @@ class WriteIHNIL(ast.NodeVisitor):
                      "Eq()": "==", "NotEq()": "!=",
                      "Is()": "Is", "IsNot()": "Is Not",
                      "In()": "In", "NotIn()": "Not In"}
+        return OPER_DICT[oper]
+
+    def oper_flip(self, oper):
+        OPER_DICT = {">": "<", "<": ">",
+                     ">=": "<=", "<=": ">=",
+                     "==": "==", "!=": "!=",
+                     "Is": "Is", "Is Not": "Is Not",
+                     "In": "In", "Not In": "Not In"}
         return OPER_DICT[oper]
 
     def var_clean(self, const):
@@ -235,7 +243,7 @@ class WriteIHNIL(ast.NodeVisitor):
             for ce in curr_elem:
                 for element in comp_elem:
                     for el in element:
-                        if ce[0] == el[0] and self.oper_swap(ce[1]) == el[1]:
+                        if ce[0] == el[0] and self.oper_flip(ce[1]) == el[1]:
                             result_list.append(self.combine_algo(ce, el))
                             break
                         else:
@@ -245,7 +253,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return result_list
 
     def combine_algo(self, left_item, right_item):
-        right_item.insert(0, self.oper_swap(left_item[1]))
+        right_item.insert(0, self.oper_flip(left_item[1]))
         for item in left_item[2:]:
             right_item.insert(0, item)
         return right_item
