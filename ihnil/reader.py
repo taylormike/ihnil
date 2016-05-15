@@ -54,8 +54,11 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             collector = list()
+            # result_list = list()
 
-            print(self.compare_algo(self.next_line(node, collector)))
+            print(self.next_line(node, collector))
+            # print(self.compare_algo(self.next_line(node, collector),
+            #                         result_list))
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -80,6 +83,12 @@ class WriteIHNIL(ast.NodeVisitor):
         return collector
 
     def sort_algo(self, input_line):
+        """
+        Perform various sorting functions as the input line dictates.
+
+        Some lines will be overly complex and simply need a "bulk clean"
+        whereas others can be optimized and will separate functions called.
+        """
         line_holder = list()
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
@@ -92,6 +101,12 @@ class WriteIHNIL(ast.NodeVisitor):
         return line_holder
 
     def eval_left(self, input_line, line_holder):
+        """
+        Called when evaluating the left side of the comparison argument line.
+
+        If the segment is a binary operation, it will be parsed and the right
+        side of the argument is passed down into the recursive call.
+        """
         left_holder = list()
         left_bin = list()
         left_holder.append(self.oper_clean(ast.dump(input_line.test.ops[0])))
@@ -154,8 +169,8 @@ class WriteIHNIL(ast.NodeVisitor):
                     "Gt()": ">", "Lt()": "<",
                     "GtE()": ">=", "LtE()": "<=",
                     "Eq()": "==", "NotEq()": "!=",
-                    "Is()": "Is", "IsNot()": "Is Not",
-                    "In()": "In", "NotIn()": "Not In"}
+                    "Is()": "is", "IsNot()": "is not",
+                    "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
 
     def oper_swap(self, oper):
@@ -165,17 +180,21 @@ class WriteIHNIL(ast.NodeVisitor):
                      "Gt()": "<", "Lt()": ">",
                      "GtE()": "<=", "LtE()": ">=",
                      "Eq()": "==", "NotEq()": "!=",
-                     "Is()": "Is", "IsNot()": "Is Not",
-                     "In()": "In", "NotIn()": "Not In"}
+                     "Is()": "is", "IsNot()": "is not",
+                     "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
 
-    def oper_flip(self, oper):
-        OPER_DICT = {">": "<", "<": ">",
-                     ">=": "<=", "<=": ">=",
-                     "==": "==", "!=": "!=",
-                     "Is": "Is", "Is Not": "Is Not",
-                     "In": "In", "Not In": "Not In"}
-        return OPER_DICT[oper]
+    # def oper_flip(self, oper):
+    #     OPER_ONE = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
+    #     OPER_TWO = ["==", "!="]
+    #     OPER_THREE = ["is", "is not", "in", "not in"]
+    #
+    #     if oper in OPER_ONE:
+    #         return OPER_ONE[oper]
+    #     elif oper in OPER_TWO:
+    #         return oper
+    #     elif oper in OPER_THREE:
+    #         return None
 
     def var_clean(self, const):
         if isinstance(const, ast.Num):
@@ -236,27 +255,50 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_list.insert(0, self.var_clean(bulk_bin.left))
         return bulk_list
 
-    def compare_algo(self, comp_elem):
-        result_list = list()
-        while len(comp_elem) > 0:
-            curr_elem = comp_elem.pop()
-            for ce in curr_elem:
-                for element in comp_elem:
-                    for el in element:
-                        if ce[0] == el[0] and self.oper_flip(ce[1]) == el[1]:
-                            result_list.append(self.combine_algo(ce, el))
-                            break
-                        else:
-                            result_list.append(curr_elem[0])
-                        break
-                    break
-        return result_list
+    def compare_algo(self, comp_node):
+        while len(comp_node) > 0:
+            comp_elem = comp_node.pop()
 
-    def combine_algo(self, left_item, right_item):
-        right_item.insert(0, self.oper_flip(left_item[1]))
-        for item in left_item[2:]:
-            right_item.insert(0, item)
-        return right_item
+
+
+
+
+    # def compare_algo(self, comp_node, result_list):
+    #     while len(comp_node) > 0:
+    #         comp_elem = comp_node.pop()
+    #         for ce in comp_elem:
+    #             for node_elem in comp_node:
+    #                 for ne in node_elem:
+    #                     if ce[0] == ne[0] and self.oper_flip(ce[1]) == ne[1]:
+    #                         result_list.append((ce, ne))
+    #                         comp_node.remove(node_elem)
+    #                         break
+    #                 break
+    #         else:
+    #             result_list.append(comp_elem[0])
+    #     return result_list
+
+# ----------------------------------------------------------------------------
+# [[['val', '>', 0]], [['val', '!=', 2]], [['val', '<', 3]]]
+# ----------------------------------------------------------------------------
+# [[['inp', '>', 0, '-', 'num'], ['num', '>', 0, '-', 'inp']],
+# [['num', '==', 0, '%', 2]],
+# [['inp', '<', 20]],
+# [['inp', '!=', 'SPAMELOT']],
+# [['inp', 'In', [1, 2, 3]]],
+# [['inp', '!=', 'num'], ['num', '!=', 'inp']],
+# [['num', '!=', 'inp', '+', 20, '-', 10], ['inp', '!=', 'num', '+', 10, '-', 20]],
+# [['inp', '==', 'num', '%', 2], ['num', '==', 'inp', '%', 2]]]
+# ----------------------------------------------------------------------------
+# [[['val1', '!=', 5]], [[1, '<', 'val2', '<', 10, '<', 'val1', '<', 20]],
+# [['val1', '<', 'val2', '!=', 15, '+', 'val1']]]
+# ----------------------------------------------------------------------------
+
+    # def combine_algo(self, left_item, right_item):
+    #     right_item.insert(0, self.oper_flip(left_item[1]))
+    #     for item in left_item[2:]:
+    #         right_item.insert(0, item)
+    #     return right_item
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""

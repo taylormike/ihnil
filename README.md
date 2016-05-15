@@ -15,7 +15,7 @@ within Pythonic principles of code.
 
 ## Usage
 
-After installation, run via with the arguments below in the terminal:  
+After installation, run via the terminal with the arguments below:  
 
 ```
 python3 reader.py [ -r/--read | -w/--read ] filename  
