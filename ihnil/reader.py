@@ -40,7 +40,7 @@ class ReadIHNIL(ast.NodeVisitor):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
-            print("[> Error node starts on {} <]\n".format(node.lineno))
+            print("[> Error node starts on line {} <]\n".format(node.lineno))
             print(codegen.to_source(node) + "\n")
             input("Hit Enter to continue\n")
             self.count += 1
@@ -88,6 +88,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
         Some lines will be overly complex and simply need a "bulk clean"
         whereas others can be optimized and will separate functions called.
+
+        - Initializes an empty list for each line passed to the algorithm.
         """
         line_holder = list()
         if isinstance(input_line.test, ast.Compare):
@@ -105,15 +107,26 @@ class WriteIHNIL(ast.NodeVisitor):
         Called when evaluating the left side of the comparison argument line.
 
         If the segment is a binary operation, it will be parsed and the right
-        side of the argument is passed down into the recursive call.
+        side of the argument is passed down into the recursive call; the
+        algorithm will also specifically parse apart modulo binary operator
+        segments in a different manner.
+        If the segment is a variable, then it has hit a termination to the loop
         """
         left_holder = list()
         left_bin = list()
-        left_holder.append(self.oper_clean(ast.dump(input_line.test.ops[0])))
+        left_holder.append(self.oper_clean(input_line.test.ops[0]))
         if isinstance(input_line.test.comparators[0], ast.BinOp):
-            for element in self.left_binop_clean(input_line.test
-                                                 .comparators[0], left_bin):
-                left_holder.append(element)
+            if ast.dump(input_line.test.comparators[0].op) == "Mod()":
+                left_holder.append(input_line.test.comparators[0].left.id)
+                left_holder.append(ast.dump(input_line.test
+                                            .comparators[0].op))
+                left_holder.append(ast.dump(input_line.test
+                                            .comparators[0].right))
+            else:
+                for element in self.left_binop_clean(input_line.test
+                                                     .comparators[0],
+                                                     left_bin):
+                    left_holder.append(element)
         else:
             left_holder.append(self.var_clean(input_line.test.comparators[0]))
 
@@ -121,13 +134,20 @@ class WriteIHNIL(ast.NodeVisitor):
             left_holder.insert(0, input_line.test.left.id)
             line_holder.append(left_holder)
         elif isinstance(input_line.test.left, ast.BinOp):
-            self.eval_binop(input_line.test.left, left_holder, line_holder)
+            if ast.dump(input_line.test.left.op) == "Mod()":
+                left_holder.insert(0, input_line.test.left.left.id)
+                left_holder.insert(1, self.oper_clean(input_line.test.left.op))
+                left_holder.insert(2, self.var_clean(input_line.test
+                                                     .left.right))
+                line_holder.append(left_holder)
+            else:
+                self.eval_binop(input_line.test.left, left_holder, line_holder)
         return line_holder
 
     def eval_comp(self, input_line, line_holder):
         comp_holder = list()
         comp_bin = list()
-        comp_holder.append(self.oper_swap(ast.dump(input_line.test.ops[0])))
+        comp_holder.append(self.oper_swap(input_line.test.ops[0]))
         if isinstance(input_line.test.left, ast.BinOp):
             for element in self.right_binop_clean(input_line.test.left,
                                                   comp_bin):
@@ -146,7 +166,7 @@ class WriteIHNIL(ast.NodeVisitor):
     def eval_binop(self, input_line, alt_holder, line_holder):
         if isinstance(input_line.left, ast.Name):
             left_holder = alt_holder[:]
-            left_holder.append(self.oper_swap(ast.dump(input_line.op)))
+            left_holder.append(self.oper_swap(input_line.op))
             left_holder.append(self.var_clean(input_line.right))
             left_holder.insert(0, input_line.left.id)
             line_holder.append(left_holder)
@@ -156,13 +176,14 @@ class WriteIHNIL(ast.NodeVisitor):
 
         if isinstance(input_line.right, ast.Name):
             right_holder = alt_holder[:]
-            right_holder.append(self.oper_swap(ast.dump(input_line.op)))
+            right_holder.append(self.oper_swap(input_line.op))
             right_holder.append(self.var_clean(input_line.left))
             right_holder.insert(0, input_line.right.id)
             line_holder.append(right_holder)
             del(right_holder)
 
     def oper_clean(self, oper):
+        oper = ast.dump(oper)
         OPER_DICT = {"Add()": "+", "Sub()": "-",
                     "Mult()": "*", "Div()": "/",
                     "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
@@ -174,6 +195,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return OPER_DICT[oper]
 
     def oper_swap(self, oper):
+        oper = ast.dump(oper)
         OPER_DICT = {"Add()": "-", "Sub()": "+",
                      "Mult()": "/", "Div()": "*",
                      "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
@@ -183,18 +205,6 @@ class WriteIHNIL(ast.NodeVisitor):
                      "Is()": "is", "IsNot()": "is not",
                      "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
-
-    # def oper_flip(self, oper):
-    #     OPER_ONE = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
-    #     OPER_TWO = ["==", "!="]
-    #     OPER_THREE = ["is", "is not", "in", "not in"]
-    #
-    #     if oper in OPER_ONE:
-    #         return OPER_ONE[oper]
-    #     elif oper in OPER_TWO:
-    #         return oper
-    #     elif oper in OPER_THREE:
-    #         return None
 
     def var_clean(self, const):
         if isinstance(const, ast.Num):
@@ -212,7 +222,7 @@ class WriteIHNIL(ast.NodeVisitor):
             return const.id
 
     def left_binop_clean(self, chunk, temp_list):
-        temp_list.append(self.oper_clean(ast.dump(chunk.op)))
+        temp_list.append(self.oper_clean(chunk.op))
         temp_list.append(self.var_clean(chunk.right))
         if isinstance(chunk.left, ast.BinOp):
             self.left_binop_clean(chunk.left, temp_list)
@@ -221,7 +231,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return temp_list
 
     def right_binop_clean(self, chunk, temp_list):
-        temp_list.append(self.oper_clean(ast.dump(chunk.op)))
+        temp_list.append(self.oper_clean(chunk.op))
         temp_list.append(self.var_clean(chunk.right))
         if isinstance(chunk.left, ast.BinOp):
             self.right_binop_clean(chunk.left, temp_list)
@@ -238,7 +248,7 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_hold.append(self.var_clean(bulk.test.left))
         bulker = zip(bulk.test.ops, bulk.test.comparators)
         for item in bulker:
-            bulk_hold.append(self.oper_clean(ast.dump(item[0])))
+            bulk_hold.append(self.oper_clean(item[0]))
             if isinstance(item[1], ast.BinOp):
                 for piece in self.bulk_bin_clean(item[1], list()):
                     bulk_hold.append(piece)
@@ -247,7 +257,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return bulk_hold
 
     def bulk_bin_clean(self, bulk_bin, bulk_list):
-        bulk_list.append(self.oper_clean(ast.dump(bulk_bin.op)))
+        bulk_list.append(self.oper_clean(bulk_bin.op))
         bulk_list.append(self.var_clean(bulk_bin.right))
         if isinstance(bulk_bin.left, ast.BinOp):
             self.bulk_bin_clean(bulk_bin.left, bulk_list)

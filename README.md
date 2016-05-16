@@ -2,9 +2,9 @@
 
 ## Description
 
-Source-to-source AST transformation and optimization.  
+Source-to-source AST transformation and code optimization.  
 
-Prounced: "eye-nil" For use on Python code modules. :snake:  
+Prounced: "EYE-nihl"; for use on Python code modules. :snake:  
 
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.
 While there are *some* instances where they are necessary, let's see if we
@@ -23,13 +23,6 @@ python3 reader.py [ -r/--read | -w/--read ] filename
 
 The default argument is ` -r / --read `.  
 Currently only available for Python 3.  
-
-## Dependencies
-
-- [argparse](https://docs.python.org/3.4/library/argparse.html#module-argparse)
-- [os](https://docs.python.org/3.4/library/os.html#module-os)
-- [ast](https://docs.python.org/3.4/library/ast.html)
-- [codegen](https://github.com/andreif/codegen)
 
 ## Contribution
 
