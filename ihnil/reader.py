@@ -54,11 +54,14 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             collector = list()
-            # result_list = list()
 
-            print(self.next_line(node, collector))
-            # print(self.compare_algo(self.next_line(node, collector),
-            #                         result_list))
+            # self.next_line(node, collector)
+            # print(self.next_line(node, collector))
+            # self.compare_algo(collector)
+            # print(self.compare_algo(collector))
+            # self.combine_algo(collector)
+            # print(self.combine_algo(self.compare_algo(collector)))
+            # print(collector)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -88,8 +91,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
         Some lines will be overly complex and simply need a "bulk clean"
         whereas others can be optimized and will separate functions called.
-
-        - Initializes an empty list for each line passed to the algorithm.
+        Initializes an empty list for each line passed to the algorithm.
         """
         line_holder = list()
         if isinstance(input_line.test, ast.Compare):
@@ -102,6 +104,9 @@ class WriteIHNIL(ast.NodeVisitor):
             line_holder.append(self.bulk_clean(input_line))
         return line_holder
 
+    # For all of the evaluation methods write in a str() function
+    #  to ensure that all items appended to the return lists are
+    #  string items and not actual lists/tuples/numbers/etc.
     def eval_left(self, input_line, line_holder):
         """
         Called when evaluating the left side of the comparison argument line.
@@ -118,10 +123,10 @@ class WriteIHNIL(ast.NodeVisitor):
         if isinstance(input_line.test.comparators[0], ast.BinOp):
             if ast.dump(input_line.test.comparators[0].op) == "Mod()":
                 left_holder.append(input_line.test.comparators[0].left.id)
-                left_holder.append(ast.dump(input_line.test
-                                            .comparators[0].op))
-                left_holder.append(ast.dump(input_line.test
-                                            .comparators[0].right))
+                left_holder.append(self.oper_clean(input_line.test
+                                                   .comparators[0].op))
+                left_holder.append(self.var_clean(input_line.test
+                                                  .comparators[0].right))
             else:
                 for element in self.left_binop_clean(input_line.test
                                                      .comparators[0],
@@ -185,13 +190,13 @@ class WriteIHNIL(ast.NodeVisitor):
     def oper_clean(self, oper):
         oper = ast.dump(oper)
         OPER_DICT = {"Add()": "+", "Sub()": "-",
-                    "Mult()": "*", "Div()": "/",
-                    "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
-                    "Gt()": ">", "Lt()": "<",
-                    "GtE()": ">=", "LtE()": "<=",
-                    "Eq()": "==", "NotEq()": "!=",
-                    "Is()": "is", "IsNot()": "is not",
-                    "In()": "in", "NotIn()": "not in"}
+                     "Mult()": "*", "Div()": "/",
+                     "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
+                     "Gt()": ">", "Lt()": "<",
+                     "GtE()": ">=", "LtE()": "<=",
+                     "Eq()": "==", "NotEq()": "!=",
+                     "Is()": "is", "IsNot()": "is not",
+                     "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
 
     def oper_swap(self, oper):
@@ -205,6 +210,19 @@ class WriteIHNIL(ast.NodeVisitor):
                      "Is()": "is", "IsNot()": "is not",
                      "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
+
+    def oper_flip(self, oper):
+        OPER_ONE = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
+        OPER_TWO = {"==": "==", "!=": "!="}
+        OPER_THREE = {"is": "is", "is not": "is not",
+                      "in": "in", "not in": "not in"}
+
+        if oper in OPER_ONE:
+            return OPER_ONE[oper]
+        elif oper in OPER_TWO:
+            return OPER_TWO[oper]
+        elif oper in OPER_THREE:
+            return OPER_THREE[oper]
 
     def var_clean(self, const):
         if isinstance(const, ast.Num):
@@ -265,50 +283,67 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_list.insert(0, self.var_clean(bulk_bin.left))
         return bulk_list
 
-    def compare_algo(self, comp_node):
-        while len(comp_node) > 0:
-            comp_elem = comp_node.pop()
-
-
-
-
-
-    # def compare_algo(self, comp_node, result_list):
+    # def compare_algo(self, comp_node):
+    #     sorted_list = list()
     #     while len(comp_node) > 0:
     #         comp_elem = comp_node.pop()
     #         for ce in comp_elem:
     #             for node_elem in comp_node:
     #                 for ne in node_elem:
     #                     if ce[0] == ne[0] and self.oper_flip(ce[1]) == ne[1]:
-    #                         result_list.append((ce, ne))
-    #                         comp_node.remove(node_elem)
+    #                         sorted_list.append([ce, ne])
+    #                         del(node_elem)
     #                         break
+    #                     else:
+    #                         sorted_list.append([ce])
+    #                         break
+    #                     break
     #                 break
+    #     del(comp_elem)
+    #     return sorted_list
+
+    def compare_algo(self, comp_node):
+        sorted_list = list()
+        comp_elem = comp_node.pop()
+        while len(comp_node) > 0:
+            for ce in comp_elem:
+                for node_elem in comp_node:
+                    for ne in node_elem:
+                        if ce[0] == ne[0] and self.oper_flip(ce[1]) == ne[1]:
+                            sorted_list.append([ce, ne])
+                            del comp_node[comp_node.index(node_elem)]
+                            comp_elem = comp_node.pop()
+                            break
+                        else:
+                            sorted_list.append([comp_elem[0]])
+                            comp_elem = comp_node.pop()
+                            break
+                        break
+                    break
+        else:
+            sorted_list.append(comp_elem[0])
+
+    # def compare_algo(self, comp_list):
+    #     sorted_list = list()
+    #     while len(comp_node) > 0:
+    #         if comp_node != []:
+    #             pass
     #         else:
-    #             result_list.append(comp_elem[0])
-    #     return result_list
+    #             pass
 
-# ----------------------------------------------------------------------------
-# [[['val', '>', 0]], [['val', '!=', 2]], [['val', '<', 3]]]
-# ----------------------------------------------------------------------------
-# [[['inp', '>', 0, '-', 'num'], ['num', '>', 0, '-', 'inp']],
-# [['num', '==', 0, '%', 2]],
-# [['inp', '<', 20]],
-# [['inp', '!=', 'SPAMELOT']],
-# [['inp', 'In', [1, 2, 3]]],
-# [['inp', '!=', 'num'], ['num', '!=', 'inp']],
-# [['num', '!=', 'inp', '+', 20, '-', 10], ['inp', '!=', 'num', '+', 10, '-', 20]],
-# [['inp', '==', 'num', '%', 2], ['num', '==', 'inp', '%', 2]]]
-# ----------------------------------------------------------------------------
-# [[['val1', '!=', 5]], [[1, '<', 'val2', '<', 10, '<', 'val1', '<', 20]],
-# [['val1', '<', 'val2', '!=', 15, '+', 'val1']]]
-# ----------------------------------------------------------------------------
-
-    # def combine_algo(self, left_item, right_item):
-    #     right_item.insert(0, self.oper_flip(left_item[1]))
-    #     for item in left_item[2:]:
-    #         right_item.insert(0, item)
-    #     return right_item
+    def combine_algo(self, comp_list):
+        result_list = list()
+        for elem in comp_list:
+            if len(elem) > 1:
+                elem[0].reverse()
+                oper = self.oper_flip(elem[0][-2])
+                complete_segment = elem[0][:-2]
+                complete_segment.append(oper)
+                complete_segment.extend(elem[1])
+                result_list.append(complete_segment)
+            else:
+                result_list.append(elem)
+        return result_list
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
