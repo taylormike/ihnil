@@ -55,13 +55,8 @@ class WriteIHNIL(ast.NodeVisitor):
 
             collector = list()
 
-            # self.next_line(node, collector)
             # print(self.next_line(node, collector))
-            # self.compare_algo(collector)
-            # print(self.compare_algo(collector))
-            # self.combine_algo(collector)
-            # print(self.combine_algo(self.compare_algo(collector)))
-            # print(collector)
+            print(self.compare_algo(self.next_line(node, collector)))
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -152,7 +147,8 @@ class WriteIHNIL(ast.NodeVisitor):
     def eval_comp(self, input_line, line_holder):
         comp_holder = list()
         comp_bin = list()
-        comp_holder.append(self.oper_swap(input_line.test.ops[0]))
+        comp_holder.append(self.oper_flip(self.oper_clean(input_line
+                                                          .test.ops[0])))
         if isinstance(input_line.test.left, ast.BinOp):
             for element in self.right_binop_clean(input_line.test.left,
                                                   comp_bin):
@@ -171,7 +167,7 @@ class WriteIHNIL(ast.NodeVisitor):
     def eval_binop(self, input_line, alt_holder, line_holder):
         if isinstance(input_line.left, ast.Name):
             left_holder = alt_holder[:]
-            left_holder.append(self.oper_swap(input_line.op))
+            left_holder.append(self.oper_flip(self.oper_clean(input_line.op)))
             left_holder.append(self.var_clean(input_line.right))
             left_holder.insert(0, input_line.left.id)
             line_holder.append(left_holder)
@@ -181,7 +177,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
         if isinstance(input_line.right, ast.Name):
             right_holder = alt_holder[:]
-            right_holder.append(self.oper_swap(input_line.op))
+            right_holder.append(self.oper_flip(self.oper_clean(input_line.op)))
             right_holder.append(self.var_clean(input_line.left))
             right_holder.insert(0, input_line.right.id)
             line_holder.append(right_holder)
@@ -199,23 +195,12 @@ class WriteIHNIL(ast.NodeVisitor):
                      "In()": "in", "NotIn()": "not in"}
         return OPER_DICT[oper]
 
-    def oper_swap(self, oper):
-        oper = ast.dump(oper)
-        OPER_DICT = {"Add()": "-", "Sub()": "+",
-                     "Mult()": "/", "Div()": "*",
-                     "FloorDiv()": "//", "Mod()": "%", "Pow()": "**",
-                     "Gt()": "<", "Lt()": ">",
-                     "GtE()": "<=", "LtE()": ">=",
-                     "Eq()": "==", "NotEq()": "!=",
-                     "Is()": "is", "IsNot()": "is not",
-                     "In()": "in", "NotIn()": "not in"}
-        return OPER_DICT[oper]
-
     def oper_flip(self, oper):
-        OPER_ONE = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
-        OPER_TWO = {"==": "==", "!=": "!="}
-        OPER_THREE = {"is": "is", "is not": "is not",
-                      "in": "in", "not in": "not in"}
+        OPER_ONE = {"+": "-", "-": "+", "*": "/", "/": "*"}
+        OPER_TWO = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
+        OPER_THREE = {"==": "==", "!=": "!="}
+        OPER_FOUR = {"is": "is", "is not": "is not",
+                     "in": "in", "not in": "not in"}
 
         if oper in OPER_ONE:
             return OPER_ONE[oper]
@@ -223,6 +208,8 @@ class WriteIHNIL(ast.NodeVisitor):
             return OPER_TWO[oper]
         elif oper in OPER_THREE:
             return OPER_THREE[oper]
+        elif oper in OPER_FOUR:
+            return OPER_FOUR[oper]
 
     def var_clean(self, const):
         if isinstance(const, ast.Num):
@@ -283,25 +270,6 @@ class WriteIHNIL(ast.NodeVisitor):
             bulk_list.insert(0, self.var_clean(bulk_bin.left))
         return bulk_list
 
-    # def compare_algo(self, comp_node):
-    #     sorted_list = list()
-    #     while len(comp_node) > 0:
-    #         comp_elem = comp_node.pop()
-    #         for ce in comp_elem:
-    #             for node_elem in comp_node:
-    #                 for ne in node_elem:
-    #                     if ce[0] == ne[0] and self.oper_flip(ce[1]) == ne[1]:
-    #                         sorted_list.append([ce, ne])
-    #                         del(node_elem)
-    #                         break
-    #                     else:
-    #                         sorted_list.append([ce])
-    #                         break
-    #                     break
-    #                 break
-    #     del(comp_elem)
-    #     return sorted_list
-
     def compare_algo(self, comp_node):
         sorted_list = list()
         comp_elem = comp_node.pop()
@@ -321,15 +289,8 @@ class WriteIHNIL(ast.NodeVisitor):
                         break
                     break
         else:
-            sorted_list.append(comp_elem[0])
-
-    # def compare_algo(self, comp_list):
-    #     sorted_list = list()
-    #     while len(comp_node) > 0:
-    #         if comp_node != []:
-    #             pass
-    #         else:
-    #             pass
+            sorted_list.append([comp_elem[0]])
+        return sorted_list
 
     def combine_algo(self, comp_list):
         result_list = list()

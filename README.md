@@ -2,9 +2,9 @@
 
 ## Description
 
-Source-to-source AST transformation and code optimization.  
+Source-to-source AST transformation and optimization.  
 
-Prounced: "EYE-nihl"; for use on Python code modules. :snake:  
+Prounced: "EYE-nil", for use on Python code modules. :snake:  
 
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.
 While there are *some* instances where they are necessary, let's see if we
@@ -13,15 +13,15 @@ can get rid of all of the useless ones.
 This is an attempt to balance between **readability** and **optimization** all
 within Pythonic principles of code.  
 
+## Installation
+
 ## Usage
 
-After installation, run via the terminal with the arguments below:  
+After installation, run via the commands below in the terminal:  
 
-```
-python3 reader.py [ -r/--read | -w/--read ] filename  
-```  
+`python3 reader.py [ -r/--read | -w/--write ] filename.py`  
 
-The default argument is ` -r / --read `.  
+The default argument is a simple printout of error line locations.
 Currently only available for Python 3.  
 
 ## Contribution
@@ -32,7 +32,12 @@ Please adhere to ` pep8 ` standards when contributing to this project.
 - The **command line tool** for static analysis of Python files can be found
 [here](https://pypi.python.org/pypi/pep8)  
 
-Pull requests will only be accepted through [Github](https://github.com/)  
+Pull requests will only be accepted through [GitHub](https://github.com/)  
+
+Keep all commit messages to approximately 60 characters, starting with an
+imperative and ending without a period. Please follow a *merge-style*
+workflow within your local repo.
+
 
 ## Credits
 
