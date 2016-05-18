@@ -105,15 +105,7 @@ class WriteIHNIL(ast.NodeVisitor):
     #  to ensure that all items appended to the return lists are
     #  string items and not actual lists/tuples/numbers/etc.
     def eval_left(self, input_line, line_holder):
-        """
-        Called when evaluating the left side of the comparison argument line.
-
-        If the segment is a binary operation, it will be parsed and the right
-        side of the argument is passed down into the recursive call; the
-        algorithm will also specifically parse apart modulo binary operator
-        segments in a different manner.
-        If the segment is a variable, then it has hit a termination to the loop
-        """
+        """Evaluate left side of the comparison argument line."""
         left_holder = list()
         left_bin = list()
         left_holder.append(self.oper_clean(input_line.test.ops[0]))
@@ -147,6 +139,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return line_holder
 
     def eval_comp(self, input_line, line_holder):
+        """Evaulate right side of the comparison argument line."""
         comp_holder = list()
         comp_bin = list()
         comp_holder.append(self.oper_flip(self.oper_clean(input_line
@@ -167,6 +160,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return line_holder
 
     def eval_binop(self, input_line, alt_holder, line_holder):
+        """Umbrella method to handle recursively parsing binary operators."""
         if isinstance(input_line.left, ast.Name):
             left_holder = alt_holder[:]
             left_holder.append(self.oper_flip(self.oper_clean(input_line.op)))
@@ -186,6 +180,7 @@ class WriteIHNIL(ast.NodeVisitor):
             del(right_holder)
 
     def oper_clean(self, oper):
+        """Translate AST nodes into text equivalents."""
         oper = ast.dump(oper)
         OPER_DICT = {"Add()": "+", "Sub()": "-",
                      "Mult()": "*", "Div()": "/",
@@ -198,6 +193,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return OPER_DICT[oper]
 
     def oper_flip(self, oper):
+        """Convert text operator into opposite operand."""
         OPER_ONE = {"+": "-", "-": "+", "*": "/", "/": "*"}
         OPER_TWO = {">": "<", "<": ">", ">=": "<=", "<=": ">="}
         OPER_THREE = {"==": "==", "!=": "!="}
@@ -214,6 +210,7 @@ class WriteIHNIL(ast.NodeVisitor):
             return OPER_FOUR[oper]
 
     def var_clean(self, const):
+        """Transformation specific node elements into text items."""
         if isinstance(const, ast.Num):
             return const.n
         elif isinstance(const, ast.Str):
@@ -229,6 +226,7 @@ class WriteIHNIL(ast.NodeVisitor):
             return const.id
 
     def left_binop_clean(self, chunk, temp_list):
+        """Recursively translate left side binary operation segments."""
         temp_list.append(self.oper_clean(chunk.op))
         temp_list.append(self.var_clean(chunk.right))
         if isinstance(chunk.left, ast.BinOp):
@@ -238,6 +236,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return temp_list
 
     def right_binop_clean(self, chunk, temp_list):
+        """Recursively translate right side binary operation segments."""
         temp_list.append(self.oper_clean(chunk.op))
         temp_list.append(self.var_clean(chunk.right))
         if isinstance(chunk.left, ast.BinOp):
@@ -247,6 +246,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return temp_list
 
     def bulk_clean(self, bulk):
+        """Parse and translate complex, multi-operator segments."""
         bulk_hold = list()
         if isinstance(bulk.test.left, ast.BinOp):
             for piece in self.bulk_bin_clean(bulk.test.left, list()):
@@ -264,6 +264,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return bulk_hold
 
     def bulk_bin_clean(self, bulk_bin, bulk_list):
+        """Call to handle binary operations in multi-operator segments."""
         bulk_list.append(self.oper_clean(bulk_bin.op))
         bulk_list.append(self.var_clean(bulk_bin.right))
         if isinstance(bulk_bin.left, ast.BinOp):
@@ -273,6 +274,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return bulk_list
 
     def compare_algo(self, comp_node):
+        """Find all related segments and group results."""
         sorted_list = list()
         comp_elem = comp_node.pop()
         while len(comp_node) > 0:
@@ -295,6 +297,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return sorted_list
 
     def combine_algo(self, comp_list):
+        """Couple segments in each group and return optimzed results."""
         result_list = list()
         for elem in comp_list:
             if len(elem) > 1:
