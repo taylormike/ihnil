@@ -55,8 +55,10 @@ class WriteIHNIL(ast.NodeVisitor):
 
             collector = list()
 
-            # print(self.next_line(node, collector))
-            print(self.compare_algo(self.next_line(node, collector)))
+            print(self.combine_algo(self
+                                    .compare_algo(self
+                                                  .next_line(node,
+                                                             collector))))
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -303,7 +305,7 @@ class WriteIHNIL(ast.NodeVisitor):
                 complete_segment.extend(elem[1])
                 result_list.append(complete_segment)
             else:
-                result_list.append(elem)
+                result_list.append(elem[0])
         return result_list
 
     def _accept_change(self):
