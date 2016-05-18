@@ -117,10 +117,8 @@ class WriteIHNIL(ast.NodeVisitor):
                 left_holder.append(self.var_clean(input_line.test
                                                   .comparators[0].right))
             else:
-                for element in self.left_binop_clean(input_line.test
-                                                     .comparators[0],
-                                                     left_bin):
-                    left_holder.append(element)
+                left_holder.extend(self.binop_clean(input_line.test
+                                                    .comparators[0], left_bin))
         else:
             left_holder.append(self.var_clean(input_line.test.comparators[0]))
 
@@ -145,9 +143,8 @@ class WriteIHNIL(ast.NodeVisitor):
         comp_holder.append(self.oper_flip(self.oper_clean(input_line
                                                           .test.ops[0])))
         if isinstance(input_line.test.left, ast.BinOp):
-            for element in self.right_binop_clean(input_line.test.left,
-                                                  comp_bin):
-                comp_holder.append(element)
+            comp_holder.extend(self.binop_clean(input_line.test.left,
+                                                comp_bin))
         else:
             comp_holder.append(self.var_clean(input_line.test.left))
 
@@ -225,22 +222,12 @@ class WriteIHNIL(ast.NodeVisitor):
         elif isinstance(const, ast.Name):
             return const.id
 
-    def left_binop_clean(self, chunk, temp_list):
-        """Recursively translate left side binary operation segments."""
+    def binop_clean(self, chunk, temp_list):
+        """Recursively translate binary operation segments."""
         temp_list.append(self.oper_clean(chunk.op))
         temp_list.append(self.var_clean(chunk.right))
         if isinstance(chunk.left, ast.BinOp):
-            self.left_binop_clean(chunk.left, temp_list)
-        else:
-            temp_list.insert(0, self.var_clean(chunk.left))
-        return temp_list
-
-    def right_binop_clean(self, chunk, temp_list):
-        """Recursively translate right side binary operation segments."""
-        temp_list.append(self.oper_clean(chunk.op))
-        temp_list.append(self.var_clean(chunk.right))
-        if isinstance(chunk.left, ast.BinOp):
-            self.right_binop_clean(chunk.left, temp_list)
+            self.binop_clean(chunk.left, temp_list)
         else:
             temp_list.insert(0, self.var_clean(chunk.left))
         return temp_list
