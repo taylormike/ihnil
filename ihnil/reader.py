@@ -55,10 +55,16 @@ class WriteIHNIL(ast.NodeVisitor):
 
             collector = list()
 
-            print(self.combine_algo(self
-                                    .compare_algo(self
-                                                  .next_line(node,
-                                                             collector))))
+            new_node = self.combine_algo(self
+                                         .compare_algo(self
+                                                       .next_line(node,
+                                                                  collector)))
+            line_val = node.lineno
+            col_val = node.col_offset
+
+            print(new_node)
+            print(line_val)
+            print(col_val)
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -67,11 +73,12 @@ class WriteIHNIL(ast.NodeVisitor):
                             "Provide your choice and hit Enter: ")
 
             if decider == "a":
-                self._accept_change()
+                self._accept_change()  # EXPAND HERE
             elif decider == "e":
-                self._edit_manually()
+                # self._edit_manually()
+                self._edit_manually(new_node, line_val, col_val)
             elif decider == "c":
-                self._mark_complete()
+                self._mark_complete()  # EXPAND HERE
             else:
                 print("No action taken")
 
@@ -101,9 +108,6 @@ class WriteIHNIL(ast.NodeVisitor):
             line_holder.append(self.bulk_clean(input_line))
         return line_holder
 
-    # For all of the evaluation methods write in a str() function
-    #  to ensure that all items appended to the return lists are
-    #  string items and not actual lists/tuples/numbers/etc.
     def eval_left(self, input_line, line_holder):
         """Evaluate left side of the comparison argument line."""
         left_holder = list()
@@ -209,14 +213,14 @@ class WriteIHNIL(ast.NodeVisitor):
     def var_clean(self, const):
         """Transformation specific node elements into text items."""
         if isinstance(const, ast.Num):
-            return const.n
+            return str(const.n)
         elif isinstance(const, ast.Str):
             return const.s
         elif isinstance(const, (ast.List, ast.Set)):
             new_list = list()
             for element in const.elts:
                 new_list.append(self.var_clean(element))
-            return new_list
+            return str(new_list)
         elif isinstance(const, ast.NameConstant):
             return const.value
         elif isinstance(const, ast.Name):
@@ -298,22 +302,45 @@ class WriteIHNIL(ast.NodeVisitor):
                 result_list.append(elem[0])
         return result_list
 
+    def result_format(self, line_collection, column):
+        finished_node = list()
+        for line in line_collection:
+            white_space = " " * 4 * column
+            finished_node.append(white_space + "if " + " ".join(line) + ":\n")
+            column += 4
+        marker_line = "# " + "-" * len(max(finished_node)) + "\n"
+        finished_node.insert(0, marker_line)
+        finished_node.append(marker_line)
+        return finished_node
+
+    def marker_lines(self, unmarked_list):
+        marked_list = ["# " + item for item in unmarked_list]
+        return marked_list
+
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
         pass
-        # this will simply add the code into the document
-        # either 1. replace completely or 2. add in surrounded with lines
+        # add code to document
+        # comment out offending code
+        # succeeding code bumped up as needed
+        # all surrounded by commented line markers
 
-    def _edit_manually(self):
+    def _edit_manually(self, line_collection, line, column):
         """Private method to allow for manual code adjustments."""
         pass
-        # this will alllow the user to edit as needed
+        new_collection = self.result_format(line_collection, column)
+        # marker_length = len(max(line_collection, key=len))
+        # new_collection.insert(0, "-" * marker_length + "\n")
+        # new_collection.append("-" * marker_length + "\n")
+        # add code to document
+        # comment out the newly added code
+        # surround by commented line markers
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
         pass
-        # add the location/content of the code node to an additional
-        # external file and ignore it
+        # ignore the error node
+        # store location/structure in an additional file
 
 
 class ElseIHNIL(ast.NodeVisitor):

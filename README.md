@@ -32,12 +32,19 @@ Please adhere to ` pep8 ` standards when contributing to this project.
 - The **command line tool** for static analysis of Python files can be found
 [here](https://pypi.python.org/pypi/pep8)  
 
+Additionally, please include proper docstrings and follow the `pydocstyle`
+guidelines for code.
+- The **command line tool** to ensure proper style can be found [here](https://github.com/PyCQA/pydocstyle)  
+
 Pull requests will only be accepted through [GitHub](https://github.com/)  
 
 Keep all commit messages to approximately 60 characters, starting with an
 imperative and ending without a period. Please follow a *merge-style*
 workflow within your local repo.
 
+Just a couple of syntactic preferences:
+- Write all strings using double quotes -> `"string"`
+- Create empty instances of objects using literals -> `list()`
 
 ## Credits
 
