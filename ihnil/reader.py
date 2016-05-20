@@ -55,10 +55,9 @@ class WriteIHNIL(ast.NodeVisitor):
 
             collector = list()
 
-            new_node = self.combine_algo(self
-                                         .compare_algo(self
-                                                       .next_line(node,
-                                                                  collector)))
+            new_node = self.next_line(node, collector)
+            new_node = self.compare_algo(new_node)
+            new_node = self.combine_algo(new_node)
             line_val = node.lineno
             col_val = node.col_offset
 
@@ -305,7 +304,7 @@ class WriteIHNIL(ast.NodeVisitor):
     def result_format(self, line_collection, column):
         finished_node = list()
         for line in line_collection:
-            white_space = " " * 4 * column
+            white_space = " " * column
             finished_node.append(white_space + "if " + " ".join(line) + ":\n")
             column += 4
         marker_line = "# " + "-" * len(max(finished_node)) + "\n"
@@ -313,7 +312,7 @@ class WriteIHNIL(ast.NodeVisitor):
         finished_node.append(marker_line)
         return finished_node
 
-    def marker_lines(self, unmarked_list):
+    def comment_out(self, unmarked_list):
         marked_list = ["# " + item for item in unmarked_list]
         return marked_list
 
@@ -325,16 +324,22 @@ class WriteIHNIL(ast.NodeVisitor):
         # succeeding code bumped up as needed
         # all surrounded by commented line markers
 
-    def _edit_manually(self, line_collection, line, column):
+    def _edit_manually(self, line_collection, line_start, column):
         """Private method to allow for manual code adjustments."""
-        pass
+        num_lines = len(line_collection)
         new_collection = self.result_format(line_collection, column)
-        # marker_length = len(max(line_collection, key=len))
-        # new_collection.insert(0, "-" * marker_length + "\n")
-        # new_collection.append("-" * marker_length + "\n")
-        # add code to document
-        # comment out the newly added code
-        # surround by commented line markers
+        comment_collection = self.comment_out(new_collection)
+
+        with open("TEST.txt", "w") as file:
+            file.writelines(comment_collection)
+
+
+
+            # note: since the code is writing the entire document over, it
+            # will need to account for the fact that it needs to continue
+            # from wherever it left off from the previous node and that
+            # it will need to add in whatever comes after the last error
+            # node all the way to the end of the document
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
