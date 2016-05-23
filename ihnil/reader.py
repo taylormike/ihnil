@@ -49,21 +49,32 @@ class ReadIHNIL(ast.NodeVisitor):
 class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
+    def __init__(self):
+        print("NITWIT OLYMPICS")  # temporary
+        # with open("TEST.txt", "r") as file:
+        #     contents = file.readlines()
+        # contents = list(enumerate(contents))
+        # for item in contents:
+        #     if item[0] == visit_if_results[0][0]:
+        #         location = contents.index(item)
+        #
+        # contents[location:location] = visit_if_results
+
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If) and node.orelse == []:
 
             collector = list()
 
+            line_val = node.lineno
+            col_val = node.col_offset
             new_node = self.next_line(node, collector)
             new_node = self.compare_algo(new_node)
             new_node = self.combine_algo(new_node)
-            line_val = node.lineno
-            col_val = node.col_offset
+            new_node = self.result_format(new_node, col_val)
 
-            print(new_node)
-            print(line_val)
-            print(col_val)
+            for item in new_node:
+                print(item[:-2])
 
             decider = input("Would you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -72,12 +83,11 @@ class WriteIHNIL(ast.NodeVisitor):
                             "Provide your choice and hit Enter: ")
 
             if decider == "a":
-                self._accept_change()  # EXPAND HERE
+                self._accept_change()
             elif decider == "e":
-                # self._edit_manually()
-                self._edit_manually(new_node, line_val, col_val)
+                self._edit_manually()
             elif decider == "c":
-                self._mark_complete()  # EXPAND HERE
+                self._mark_complete()
             else:
                 print("No action taken")
 
@@ -302,17 +312,19 @@ class WriteIHNIL(ast.NodeVisitor):
         return result_list
 
     def result_format(self, line_collection, column):
+        """Transform optimized lists into strings encased with line markers."""
         finished_node = list()
         for line in line_collection:
             white_space = " " * column
             finished_node.append(white_space + "if " + " ".join(line) + ":\n")
             column += 4
-        marker_line = "# " + "-" * len(max(finished_node)) + "\n"
+        marker_line = "# " + "-" * (len(max(finished_node)) + column) + "\n"
         finished_node.insert(0, marker_line)
         finished_node.append(marker_line)
         return finished_node
 
     def comment_out(self, unmarked_list):
+        """Apply comments to the target code block."""
         marked_list = ["# " + item for item in unmarked_list]
         return marked_list
 
@@ -324,16 +336,16 @@ class WriteIHNIL(ast.NodeVisitor):
         # succeeding code bumped up as needed
         # all surrounded by commented line markers
 
-    def _edit_manually(self, line_collection, line_start, column):
+    def _edit_manually(self):
         """Private method to allow for manual code adjustments."""
-        num_lines = len(line_collection)
-        new_collection = self.result_format(line_collection, column)
-        comment_collection = self.comment_out(new_collection)
-
-        with open("TEST.txt", "w") as file:
-            file.writelines(comment_collection)
-
-
+        pass
+        # extra arguments : line_collection, line_start, column
+        # num_lines = len(line_collection)
+        # new_collection = self.result_format(line_collection, column)
+        # comment_collection = self.comment_out(new_collection)
+        #
+        # with open("TEST.txt", "w") as file:
+        #     file.writelines(comment_collection)
 
             # note: since the code is writing the entire document over, it
             # will need to account for the fact that it needs to continue

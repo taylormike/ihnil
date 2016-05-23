@@ -4,7 +4,7 @@
 
 Source-to-source AST transformation and optimization.  
 
-Prounced: "EYE-nil", for use on Python code modules. :snake:  
+Pronounced "EYE-nil"; for use on Python code modules. :snake:  
 
 I hate nested "if" loops. They're ugly, they're slow, they've got to go.
 While there are *some* instances where they are necessary, let's see if we
@@ -14,6 +14,8 @@ This is an attempt to balance between **readability** and **optimization** all
 within Pythonic principles of code.  
 
 ## Installation
+
+The source code can be downloaded directly from GitHub.  
 
 ## Usage
 
@@ -34,6 +36,7 @@ Please adhere to ` pep8 ` standards when contributing to this project.
 
 Additionally, please include proper docstrings and follow the `pydocstyle`
 guidelines for code.
+- The **PEP 257** regarding docstrings can be found [here](https://www.python.org/dev/peps/pep-0257/)
 - The **command line tool** to ensure proper style can be found [here](https://github.com/PyCQA/pydocstyle)  
 
 Pull requests will only be accepted through [GitHub](https://github.com/)  
