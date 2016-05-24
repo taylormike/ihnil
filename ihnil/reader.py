@@ -40,8 +40,10 @@ class ReadIHNIL(ast.NodeVisitor):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
             print("[> Nested 'if' error number {} <]".format(self.count))
-            print("[> Error node starts on line {} <]\n".format(node.lineno))
-            print(codegen.to_source(node) + "\n")
+            print("[> Error node starts on line {} <]".format(node.lineno))
+            print("-" * 55)
+            print(codegen.to_source(node))
+            print("-" * 55)
             input("Hit Enter to continue\n")
             self.count += 1
 
@@ -50,15 +52,9 @@ class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
     def __init__(self):
-        print("NITWIT OLYMPICS")  # temporary
-        # with open("TEST.txt", "r") as file:
-        #     contents = file.readlines()
-        # contents = list(enumerate(contents))
-        # for item in contents:
-        #     if item[0] == visit_if_results[0][0]:
-        #         location = contents.index(item)
-        #
-        # contents[location:location] = visit_if_results
+        with open(args.file_name.name, "r") as f:
+            contents = f.readlines()
+        self.contents = list(enumerate(contents))
 
     def visit_If(self, node):
         """Subclassed ast module method."""
@@ -76,7 +72,9 @@ class WriteIHNIL(ast.NodeVisitor):
             for item in new_node:
                 print(item[:-2])
 
-            decider = input("Would you like to:\n"
+            # print(self.contents[0])
+
+            decider = input("\nWould you like to:\n"
                             "Accept change  ->  'a'\n"
                             "Edit manually  ->  'e'\n"
                             "Mark complete  ->  'c'\n"
@@ -89,7 +87,8 @@ class WriteIHNIL(ast.NodeVisitor):
             elif decider == "c":
                 self._mark_complete()
             else:
-                print("No action taken")
+                print("\n--> No action taken")
+            print()
 
     def next_line(self, line, collector):
         """Pull apart the error node recursively into individual lines."""
@@ -327,6 +326,13 @@ class WriteIHNIL(ast.NodeVisitor):
         """Apply comments to the target code block."""
         marked_list = ["# " + item for item in unmarked_list]
         return marked_list
+
+    # temporary thingy
+    # for item in contents:
+    #     if item[0] == visit_if_results[0][0]:
+    #         location = contents.index(item)
+    #
+    # contents[location:location] = visit_if_results
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
