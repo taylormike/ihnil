@@ -50,11 +50,9 @@ class ReadIHNIL(ast.NodeVisitor):
 
 class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
-
-    def __init__(self):
-        with open(args.file_name.name, "r") as f:
-            contents = f.readlines()
-        self.contents = list(enumerate(contents))
+    with open(args.file_name.name, "r") as f:
+        contents = f.readlines()
+    contents = list(enumerate(contents))
 
     def visit_If(self, node):
         """Subclassed ast module method."""
@@ -72,7 +70,7 @@ class WriteIHNIL(ast.NodeVisitor):
             for item in new_node:
                 print(item[:-2])
 
-            # print(self.contents[0])
+            pre_list = self.apply_enumeration(new_node, line_val)
 
             decider = input("\nWould you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -87,8 +85,7 @@ class WriteIHNIL(ast.NodeVisitor):
             elif decider == "c":
                 self._mark_complete()
             else:
-                print("\n--> No action taken")
-            print()
+                print("\n--> No action taken\n")
 
     def next_line(self, line, collector):
         """Pull apart the error node recursively into individual lines."""
@@ -98,13 +95,7 @@ class WriteIHNIL(ast.NodeVisitor):
         return collector
 
     def sort_algo(self, input_line):
-        """
-        Perform various sorting functions as the input line dictates.
-
-        Some lines will be overly complex and simply need a "bulk clean"
-        whereas others can be optimized and will separate functions called.
-        Initializes an empty list for each line passed to the algorithm.
-        """
+        """Perform various sorting functions as the input line dictates."""
         line_holder = list()
         if isinstance(input_line.test, ast.Compare):
             if len(input_line.test.ops) > 1:
@@ -317,53 +308,35 @@ class WriteIHNIL(ast.NodeVisitor):
             white_space = " " * column
             finished_node.append(white_space + "if " + " ".join(line) + ":\n")
             column += 4
-        marker_line = "# " + "-" * (len(max(finished_node)) + column) + "\n"
+        marker_line = "# " + "-" * 55
         finished_node.insert(0, marker_line)
         finished_node.append(marker_line)
         return finished_node
 
     def comment_out(self, unmarked_list):
-        """Apply comments to the target code block."""
+        """Apply comments to the target code block; input must be a list."""
         marked_list = ["# " + item for item in unmarked_list]
         return marked_list
 
-    # temporary thingy
-    # for item in contents:
-    #     if item[0] == visit_if_results[0][0]:
-    #         location = contents.index(item)
-    #
-    # contents[location:location] = visit_if_results
+    def apply_enumeration(self, input_list, line_start):
+        """Enumerate optimized line list to allow targeted insertion."""
+        output_list = [(number, line) for number, line
+                       in enumerate(input_list, line_start)]
+        return output_list
 
     def _accept_change(self):
         """Private method to automatically apply optimized code."""
         pass
-        # add code to document
-        # comment out offending code
-        # succeeding code bumped up as needed
-        # all surrounded by commented line markers
 
-    def _edit_manually(self):
+    def _edit_manually(self, enum_node, enum_file):
         """Private method to allow for manual code adjustments."""
+        # for family in families[::-1]:
+        #     files[family[0][0]:family[0][0]] = family
         pass
-        # extra arguments : line_collection, line_start, column
-        # num_lines = len(line_collection)
-        # new_collection = self.result_format(line_collection, column)
-        # comment_collection = self.comment_out(new_collection)
-        #
-        # with open("TEST.txt", "w") as file:
-        #     file.writelines(comment_collection)
-
-            # note: since the code is writing the entire document over, it
-            # will need to account for the fact that it needs to continue
-            # from wherever it left off from the previous node and that
-            # it will need to add in whatever comes after the last error
-            # node all the way to the end of the document
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
         pass
-        # ignore the error node
-        # store location/structure in an additional file
 
 
 class ElseIHNIL(ast.NodeVisitor):
