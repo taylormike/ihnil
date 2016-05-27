@@ -1,7 +1,7 @@
 """
 IHNIL main parsing module.
 
-Provides the interface for evaluating a given target file
+Provides the interface for evaluating a given target file.
 """
 
 import argparse
@@ -50,9 +50,11 @@ class ReadIHNIL(ast.NodeVisitor):
 
 class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
+
     with open(args.file_name.name, "r") as f:
         contents = f.readlines()
     contents = list(enumerate(contents))
+    results = []
 
     def visit_If(self, node):
         """Subclassed ast module method."""
@@ -70,7 +72,7 @@ class WriteIHNIL(ast.NodeVisitor):
             for item in new_node:
                 print(item[:-2])
 
-            pre_list = self.apply_enumeration(new_node, line_val)
+            WriteIHNIL.results = self.apply_enumeration(new_node, line_val)
 
             decider = input("\nWould you like to:\n"
                             "Accept change  ->  'a'\n"
@@ -86,6 +88,8 @@ class WriteIHNIL(ast.NodeVisitor):
                 self._mark_complete()
             else:
                 print("\n--> No action taken\n")
+
+        return WriteIHNIL.results
 
     def next_line(self, line, collector):
         """Pull apart the error node recursively into individual lines."""
@@ -315,7 +319,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def comment_out(self, unmarked_list):
         """Apply comments to the target code block; input must be a list."""
-        marked_list = ["# " + item for item in unmarked_list]
+        marked_list = ["# " + item[1] for item in unmarked_list]
         return marked_list
 
     def apply_enumeration(self, input_list, line_start):
@@ -328,11 +332,16 @@ class WriteIHNIL(ast.NodeVisitor):
         """Private method to automatically apply optimized code."""
         pass
 
-    def _edit_manually(self, enum_node, enum_file):
+    def _edit_manually(self):
         """Private method to allow for manual code adjustments."""
-        # for family in families[::-1]:
-        #     files[family[0][0]:family[0][0]] = family
-        pass
+        comment_piece = self.comment_out(WriteIHNIL.results)
+        WriteIHNIL.contents[WriteIHNIL.results[0][0]
+                            :WriteIHNIL.results[0][0]] = comment_piece
+        final_out = [item[1] for item in WriteIHNIL.contents]
+        with open("TEST.txt", "w") as f:
+            f.writelines(final_out)
+        # for item in WriteIHNIL.results[::-1]:
+        #     WriteIHNIL.contents[item[0][0]:item[0][0]] = item
 
     def _mark_complete(self):
         """Private method to mark and ignore non-optimized code."""
