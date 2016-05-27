@@ -45,7 +45,7 @@ class ReadIHNIL(ast.NodeVisitor):
             print(codegen.to_source(node))
             print("-" * 55)
             input("Hit Enter to continue\n")
-            self.count += 1
+            ReadIHNIL.count += 1
 
 
 class WriteIHNIL(ast.NodeVisitor):
@@ -56,9 +56,14 @@ class WriteIHNIL(ast.NodeVisitor):
     contents = list(enumerate(contents))
     results = []
 
+    count = 1
+
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If) and node.orelse == []:
+
+            print("[> Nested 'if' error number {} corrected "
+                  "syntax <]".format(WriteIHNIL.count))
 
             collector = list()
 
@@ -67,29 +72,19 @@ class WriteIHNIL(ast.NodeVisitor):
             new_node = self.next_line(node, collector)
             new_node = self.compare_algo(new_node)
             new_node = self.combine_algo(new_node)
-            new_node = self.result_format(new_node, col_val)
+            out_node = self.result_format(new_node, col_val)
+            new_node = self.comment_out(out_node)
 
-            for item in new_node:
+            for item in out_node:
                 print(item[:-2])
 
-            WriteIHNIL.results = self.apply_enumeration(new_node, line_val)
+            WriteIHNIL.results.append(self.apply_enumeration(new_node,
+                                                             line_val))
 
-            decider = input("\nWould you like to:\n"
-                            "Accept change  ->  'a'\n"
-                            "Edit manually  ->  'e'\n"
-                            "Mark complete  ->  'c'\n"
-                            "Provide your choice and hit Enter: ")
+            WriteIHNIL.count += 1
 
-            if decider == "a":
-                self._accept_change()
-            elif decider == "e":
-                self._edit_manually()
-            elif decider == "c":
-                self._mark_complete()
-            else:
-                print("\n--> No action taken\n")
+            # input("Hit Enter to continue\n")
 
-        return WriteIHNIL.results
 
     def next_line(self, line, collector):
         """Pull apart the error node recursively into individual lines."""
@@ -319,7 +314,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
     def comment_out(self, unmarked_list):
         """Apply comments to the target code block; input must be a list."""
-        marked_list = ["# " + item[1] for item in unmarked_list]
+        marked_list = ["# " + item for item in unmarked_list]
         return marked_list
 
     def apply_enumeration(self, input_list, line_start):
@@ -328,24 +323,11 @@ class WriteIHNIL(ast.NodeVisitor):
                        in enumerate(input_list, line_start)]
         return output_list
 
-    def _accept_change(self):
-        """Private method to automatically apply optimized code."""
-        pass
-
-    def _edit_manually(self):
-        """Private method to allow for manual code adjustments."""
-        comment_piece = self.comment_out(WriteIHNIL.results)
-        WriteIHNIL.contents[WriteIHNIL.results[0][0]
-                            :WriteIHNIL.results[0][0]] = comment_piece
-        final_out = [item[1] for item in WriteIHNIL.contents]
+    def insert_fixes(self):
+        for item in WriteIHNIL.results[::-1]:
+            WriteIHNIL.contents[item[0][0]:item[0][0]] = item
         with open("TEST.txt", "w") as f:
-            f.writelines(final_out)
-        # for item in WriteIHNIL.results[::-1]:
-        #     WriteIHNIL.contents[item[0][0]:item[0][0]] = item
-
-    def _mark_complete(self):
-        """Private method to mark and ignore non-optimized code."""
-        pass
+            f.writelines(WriteIHNIL.contents)
 
 
 class ElseIHNIL(ast.NodeVisitor):
