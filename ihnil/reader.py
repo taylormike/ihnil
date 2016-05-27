@@ -83,8 +83,7 @@ class WriteIHNIL(ast.NodeVisitor):
 
             WriteIHNIL.count += 1
 
-            # input("Hit Enter to continue\n")
-
+            input("Hit Enter to continue\n")
 
     def next_line(self, line, collector):
         """Pull apart the error node recursively into individual lines."""
@@ -307,7 +306,7 @@ class WriteIHNIL(ast.NodeVisitor):
             white_space = " " * column
             finished_node.append(white_space + "if " + " ".join(line) + ":\n")
             column += 4
-        marker_line = "# " + "-" * 55
+        marker_line = "# " + "-" * 55 + "\n"
         finished_node.insert(0, marker_line)
         finished_node.append(marker_line)
         return finished_node
@@ -320,14 +319,16 @@ class WriteIHNIL(ast.NodeVisitor):
     def apply_enumeration(self, input_list, line_start):
         """Enumerate optimized line list to allow targeted insertion."""
         output_list = [(number, line) for number, line
-                       in enumerate(input_list, line_start)]
+                       in enumerate(input_list, line_start - 1)]
         return output_list
 
     def insert_fixes(self):
+        """Insert properly optimized code back into document contents."""
         for item in WriteIHNIL.results[::-1]:
             WriteIHNIL.contents[item[0][0]:item[0][0]] = item
+        final_output = [item[1] for item in WriteIHNIL.contents]
         with open("TEST.txt", "w") as f:
-            f.writelines(WriteIHNIL.contents)
+            f.writelines(final_output)
 
 
 class ElseIHNIL(ast.NodeVisitor):
@@ -362,6 +363,7 @@ if file_extension == ".py":
         ReadIHNIL().visit(module)
     elif args.write:
         WriteIHNIL().visit(module)
+        WriteIHNIL().insert_fixes()
     else:
         ElseIHNIL().visit(module)
 else:
