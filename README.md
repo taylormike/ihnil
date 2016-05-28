@@ -1,5 +1,7 @@
 # IHNIL - I Hate Nested If Loops
 
+[![Build Status](https://travis-ci.org/forstmeier/ihnil.svg?branch=master)](https://travis-ci.org/forstmeier/ihnil)
+
 ## Description
 
 Source-to-source AST transformation and optimization.  

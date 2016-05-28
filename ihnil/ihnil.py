@@ -1,16 +1,18 @@
+#!/usr/bin/python
 """
 IHNIL main parsing module.
 
 Provides the interface for evaluating a given target file.
 """
 
-__version__ = "1.0.0"
 
 import argparse
 import os
 import ast
 import codegen
 
+
+__version__ = "1.0.0"
 
 parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
                                  epilog="For details see "
