@@ -4,6 +4,8 @@ IHNIL main parsing module.
 Provides the interface for evaluating a given target file.
 """
 
+__version__ = "1.0.0"
+
 import argparse
 import os
 import ast
@@ -39,8 +41,8 @@ class ReadIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
-            print("[> Nested 'if' error number {} <]".format(self.count))
-            print("[> Error node starts on line {} <]".format(node.lineno))
+            print("[> Nested 'if' error number {}\t<]".format(self.count))
+            print("[> Error node starts on line {}\t<]".format(node.lineno))
             print("-" * 55)
             print(codegen.to_source(node))
             print("-" * 55)
@@ -339,8 +341,8 @@ class ElseIHNIL(ast.NodeVisitor):
     def visit_If(self, node):
         """Subclassed ast module method."""
         if isinstance(node.body[0], ast.If):
-            print("[> Nested 'if' number {} start "
-                  "line {}".format(self.count, node.lineno))
+            print("[> Nested 'if' number {}\tstart "
+                  "line {}\t<]".format(self.count, node.lineno))
             self.end_line(node, self.count)
             self.count += 1
 
@@ -350,8 +352,8 @@ class ElseIHNIL(ast.NodeVisitor):
             self.endno = node.lineno
             self.end_line(node.body[0], count)
         else:
-            print("[> Nested 'if' number {} end "
-                  "line {}".format(count, self.endno))
+            print("[> Nested 'if' number {}\tend "
+                  "line {}\t<]".format(count, self.endno))
 
 
 if file_extension == ".py":
@@ -364,6 +366,14 @@ if file_extension == ".py":
     elif args.write:
         WriteIHNIL().visit(module)
         WriteIHNIL().insert_fixes()
+        # Notes:
+        # write in functionality so that the first thing the program does
+        # on invoking WriteIHNIL is copy the contents of the target file
+        # into a BACKUP.TXT file stored within this project's repository
+        # and is accessed along that file path; if the program fails in the
+        # middle of writing back in the fixes, prompt a crash alert and then
+        # copy the BACKUP.TXT contents into the target file and return to
+        # the terminal
     else:
         ElseIHNIL().visit(module)
 else:
