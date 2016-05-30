@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.4
 """
 IHNIL main parsing module.
 
@@ -14,25 +14,26 @@ import codegen
 
 __version__ = "1.0.0"
 
-parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
-                                 epilog="For details see "
-                                 "https://github.com/forstmeier/ihnil")
 
-parser.add_argument("file_name",
-                    type=argparse.FileType(),
-                    help="input file for %(prog)s optimization")
+def command_line_call():
+    parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
+                                     epilog="For details see "
+                                     "https://github.com/forstmeier/ihnil")
 
-output = parser.add_mutually_exclusive_group()
-output.add_argument("-r", "--read",
-                    action="store_true",
-                    help="find and print 'if' loop errors to the terminal")
-output.add_argument("-w", "--write",
-                    action="store_true",
-                    help="write 'if' alternatives to the module and terminal")
+    parser.add_argument("file_name",
+                        type=argparse.FileType(),
+                        help="input file for %(prog)s optimization")
 
-args = parser.parse_args()
-string_name = str(args.file_name.name)
-file_extension = os.path.splitext(string_name)[1]
+    output = parser.add_mutually_exclusive_group()
+    output.add_argument("-r", "--read",
+                        action="store_true",
+                        help="find and print 'if' loop errors to the terminal")
+    output.add_argument("-w", "--write",
+                        action="store_true",
+                        help="write 'if' alternatives to the module and terminal")
+
+    args = parser.parse_args()
+    return args
 
 
 class ReadIHNIL(ast.NodeVisitor):
@@ -55,9 +56,15 @@ class ReadIHNIL(ast.NodeVisitor):
 class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
-    with open(args.file_name.name, "r") as f:
-        contents = f.readlines()
-    contents = list(enumerate(contents))
+    def __init__(self, args):
+        # self.args = args
+        # return self.args
+
+        with open(args.file_name.name, "r") as f:
+            contents = f.readlines()
+        self.contents = list(enumerate(contents))
+        # return contents
+
     results = []
 
     count = 1
@@ -329,8 +336,8 @@ class WriteIHNIL(ast.NodeVisitor):
     def insert_fixes(self):
         """Insert properly optimized code back into document contents."""
         for item in WriteIHNIL.results[::-1]:
-            WriteIHNIL.contents[item[0][0]:item[0][0]] = item
-        final_output = [item[1] for item in WriteIHNIL.contents]
+            self.contents[item[0][0]:item[0][0]] = item
+        final_output = [item[1] for item in self.contents]
         with open("TEST.txt", "w") as f:
             f.writelines(final_output)
 
@@ -358,25 +365,28 @@ class ElseIHNIL(ast.NodeVisitor):
                   "line {}\t<]".format(count, self.endno))
 
 
-if file_extension == ".py":
-    with open(args.file_name.name) as f:
+def main():
+    result = command_line_call()
+
+    with open(result.file_name.name) as f:
         file_contents = f.read()
     module = ast.parse(file_contents)
 
-    if args.read:
-        ReadIHNIL().visit(module)
-    elif args.write:
-        WriteIHNIL().visit(module)
-        WriteIHNIL().insert_fixes()
-        # Notes:
-        # write in functionality so that the first thing the program does
-        # on invoking WriteIHNIL is copy the contents of the target file
-        # into a BACKUP.TXT file stored within this project's repository
-        # and is accessed along that file path; if the program fails in the
-        # middle of writing back in the fixes, prompt a crash alert and then
-        # copy the BACKUP.TXT contents into the target file and return to
-        # the terminal
+    string_name = str(result.file_name.name)
+    file_extension = os.path.splitext(string_name)[1]
+
+    if file_extension == ".py":
+        if result.read:
+            ReadIHNIL().visit(module)
+        elif result.write:
+            write_out = WriteIHNIL(result)
+            write_out.visit(module)
+            write_out.insert_fixes()
+            # WriteIHNIL(result).visit(module)
+            # WriteIHNIL().insert_fixes()
+        else:
+            ElseIHNIL().visit(module)
     else:
-        ElseIHNIL().visit(module)
-else:
-    print("\nPlease enter a Python file\n")
+        print("\nPlease enter a Python file\n")
+
+main()
