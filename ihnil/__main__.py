@@ -1,5 +1,5 @@
-"""Provide entry point into the ihnil.main() function."""
 import ihnil
 
 
-ihnil.main()
+# if __name__ == "__main__":
+#     ihnil.main()

@@ -382,11 +382,10 @@ def main():
             write_out = WriteIHNIL(result)
             write_out.visit(module)
             write_out.insert_fixes()
-            # WriteIHNIL(result).visit(module)
-            # WriteIHNIL().insert_fixes()
         else:
             ElseIHNIL().visit(module)
     else:
         print("\nPlease enter a Python file\n")
 
-main()
+if __name__ == "__main__":
+    main()
