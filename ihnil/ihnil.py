@@ -1,4 +1,4 @@
-#!/usr/bin/python3.4
+#!/usr/bin/env python
 """
 IHNIL main parsing module.
 
@@ -57,13 +57,9 @@ class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
     def __init__(self, args):
-        # self.args = args
-        # return self.args
-
         with open(args.file_name.name, "r") as f:
             contents = f.readlines()
         self.contents = list(enumerate(contents))
-        # return contents
 
     results = []
 
@@ -333,13 +329,16 @@ class WriteIHNIL(ast.NodeVisitor):
                        in enumerate(input_list, line_start - 1)]
         return output_list
 
-    def insert_fixes(self):
+    def insert_fixes(self, target_name):
         """Insert properly optimized code back into document contents."""
         for item in WriteIHNIL.results[::-1]:
             self.contents[item[0][0]:item[0][0]] = item
         final_output = [item[1] for item in self.contents]
-        with open("TEST.txt", "w") as f:
+        temp_name = "ihnil_" + target_name
+        with open(temp_name, "w") as f:
             f.writelines(final_output)
+        os.remove(target_name)
+        os.rename(temp_name, target_name)
 
 
 class ElseIHNIL(ast.NodeVisitor):
@@ -381,7 +380,7 @@ def main():
         elif result.write:
             write_out = WriteIHNIL(result)
             write_out.visit(module)
-            write_out.insert_fixes()
+            write_out.insert_fixes(string_name)
         else:
             ElseIHNIL().visit(module)
     else:
