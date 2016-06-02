@@ -16,6 +16,7 @@ __version__ = "1.0.0"
 
 
 def command_line_call():
+    """Provide access to command line argument inputs."""
     parser = argparse.ArgumentParser(description="Python 'if' loop optimizer",
                                      epilog="For details see "
                                      "https://github.com/forstmeier/ihnil")
@@ -27,10 +28,10 @@ def command_line_call():
     output = parser.add_mutually_exclusive_group()
     output.add_argument("-r", "--read",
                         action="store_true",
-                        help="find and print 'if' loop errors to the terminal")
+                        help="find & print 'if' loop errors to the terminal")
     output.add_argument("-w", "--write",
                         action="store_true",
-                        help="write 'if' alternatives to the module and terminal")
+                        help="write 'if' alternatives to the file & terminal")
 
     args = parser.parse_args()
     return args
@@ -57,6 +58,7 @@ class WriteIHNIL(ast.NodeVisitor):
     """This class allows for comprehensive code optimization."""
 
     def __init__(self, args):
+        """Generate full unedited document contents to the module."""
         with open(args.file_name.name, "r") as f:
             contents = f.readlines()
         self.contents = list(enumerate(contents))
@@ -365,6 +367,7 @@ class ElseIHNIL(ast.NodeVisitor):
 
 
 def main():
+    """Execute full module arguments according to comand line inputs.""""
     result = command_line_call()
 
     with open(result.file_name.name) as f:
