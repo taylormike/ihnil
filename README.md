@@ -1,6 +1,6 @@
 # IHNIL - I Hate Nested If Loops
 
-[![Build Status](https://travis-ci.org/forstmeier/ihnil.svg?branch=master)](https://travis-ci.org/forstmeier/ihnil)
+[![Build Status](https://travis-ci.org/forstmeier/ihnil.svg?branch=master)](https://travis-ci.org/forstmeier/ihnil) [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badge/)
 
 ## Description
 
