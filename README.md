@@ -1,5 +1,7 @@
 # IHNIL - I Hate Nested If Loops
 
+[![Join the chat at https://gitter.im/forstmeier/ihnil](https://badges.gitter.im/forstmeier/ihnil.svg)](https://gitter.im/forstmeier/ihnil?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://travis-ci.org/forstmeier/ihnil.svg?branch=master)](https://travis-ci.org/forstmeier/ihnil) [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badge/)
 
 ## Description
