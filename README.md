@@ -19,7 +19,7 @@ within Pythonic principles of code.
 
 ## Installation
 
-The source code can be downloaded directly from GitHub.  
+The source code can be downloaded directly from GitHub. Incomplete  
 
 ## Usage
 
